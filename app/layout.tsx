@@ -34,9 +34,9 @@ export default function RootLayout({
               </div>
               <div className="flex-1 overflow-auto py-2">
                 <nav className="grid items-start px-4 text-sm font-medium">
-                  <NavItem href="/jobcomposer">
+                  <NavItem href="/job-composer">
                     <SettingsIcon className="h-4 w-4" />
-                    JobComposer
+                    Job Composer
                   </NavItem>
                   <NavItem href="/">
                     <UsersIcon className="h-4 w-4" />
