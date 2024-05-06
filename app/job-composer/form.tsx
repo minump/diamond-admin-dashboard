@@ -14,8 +14,12 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { Select } from "@/components/ui/select"
+// Assuming these are the functions that interface with your backend to execute the tasks
+import { singleNodeTask, registerContainer, multiNodeTask } from "@/lib/taskHandlers"
 
 const formSchema = z.object({
+  taskType: z.enum(['singleNode', 'registerContainer', 'multiNode']),
   jobName: z.string().min(2, {
     message: "Job name must be at least 2 characters.",
   }),
@@ -25,25 +29,59 @@ const formSchema = z.object({
 })
 
 export function JobComposerForm() {
-  // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      taskType: 'singleNode',
       jobName: "",
       params: "",
     },
   })
 
-  // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values)
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      switch (values.taskType) {
+        case 'singleNode':
+          await singleNodeTask(values);
+          break;
+        case 'registerContainer':
+          await registerContainer(values);
+          break;
+        case 'multiNode':
+          await multiNodeTask(values);
+          break;
+        default:
+          console.error('Invalid task type');
+      }
+      console.log('Task triggered successfully');
+    } catch (error) {
+      console.error('Error triggering task:', error);
+    }
   }
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <FormField
+          control={form.control}
+          name="taskType"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Task Type</FormLabel>
+              <FormControl>
+                <Select {...field}>
+                  <option value="singleNode">Single Node Task</option>
+                  <option value="registerContainer">Register Container Task</option>
+                  <option value="multiNode">Multi Node Task</option>
+                </Select>
+              </FormControl>
+              <FormDescription>
+                Select the type of task you want to execute.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <FormField
           control={form.control}
           name="jobName"
@@ -65,7 +103,7 @@ export function JobComposerForm() {
           name="params"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Job params</FormLabel>
+              <FormLabel>Job Params</FormLabel>
               <FormControl>
                 <Input placeholder="Job params" {...field} />
               </FormControl>
@@ -80,5 +118,4 @@ export function JobComposerForm() {
       </form>
     </Form>
   )
-
 }

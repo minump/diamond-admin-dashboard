@@ -3,7 +3,7 @@ import './globals.css';
 import Link from 'next/link';
 import { Analytics } from '@vercel/analytics/react';
 import { Logo, SettingsIcon, EditIcon, UsersIcon, VercelLogo } from '@/components/icons';
-import { User } from './user';
+import { User } from './users/user';
 import { NavItem } from './nav-item';
 
 export const metadata = {
@@ -29,16 +29,20 @@ export default function RootLayout({
                   href="/"
                 >
                   <Logo />
-                  <span className="">ACME</span>
+                  <span className="">DIAMOND</span>
                 </Link>
               </div>
               <div className="flex-1 overflow-auto py-2">
                 <nav className="grid items-start px-4 text-sm font-medium">
+                <NavItem href="/">
+                    <SettingsIcon className="h-4 w-4" />
+                    Dashboard
+                  </NavItem>
                   <NavItem href="/job-composer">
                     <EditIcon className="h-4 w-4" />
                     Job Composer
                   </NavItem>
-                  <NavItem href="/">
+                  <NavItem href="/users">
                     <UsersIcon className="h-4 w-4" />
                     Users
                   </NavItem>
@@ -61,7 +65,7 @@ export default function RootLayout({
                 href="/"
               >
                 <Logo />
-                <span className="">ACME</span>
+                <span className="">DIAMOND</span>
               </Link>
               <User />
             </header>
