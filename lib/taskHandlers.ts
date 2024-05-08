@@ -2,7 +2,7 @@
 
 export async function singleNodeTask(data: any) {
   try {
-    const response = await fetch(`${process.env.VERCEL_URL}/api/single_node_task`, {
+    const response = await fetch(`/api/single_node_task`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
