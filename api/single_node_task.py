@@ -10,4 +10,5 @@ class handler(BaseHTTPRequestHandler):
         response = {
             "message": "Single node task executed successfully"
         }
-        self.wfile.write(str(response).encode('utf-8'))
+        return response
+    
