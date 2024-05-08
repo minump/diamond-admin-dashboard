@@ -14,7 +14,12 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { Select } from "@/components/ui/select"
+import { 
+  Select, 
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue } from "@/components/ui/select"
 // Assuming these are the functions that interface with your backend to execute the tasks
 import { singleNodeTask, registerContainer, multiNodeTask } from "@/lib/taskHandlers"
 
@@ -33,8 +38,8 @@ export function JobComposerForm() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       taskType: 'singleNode',
-      jobName: "",
-      params: "",
+      jobName: "myJob",
+      params: "myParams",
     },
   })
 
@@ -68,13 +73,18 @@ export function JobComposerForm() {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Task Type</FormLabel>
-              <FormControl>
-                <Select {...field}>
-                  <option value="singleNode">Single Node Task</option>
-                  <option value="registerContainer">Register Container Task</option>
-                  <option value="multiNode">Multi Node Task</option>
-                </Select>
-              </FormControl>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a verified email to display" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="singleNode">Single Node Task</SelectItem>
+                  <SelectItem value="registerContainer">Register Container Task</SelectItem>
+                  <SelectItem value="multiNode">Multi Node Task</SelectItem>
+                </SelectContent>
+              </Select>
               <FormDescription>
                 Select the type of task you want to execute.
               </FormDescription>
