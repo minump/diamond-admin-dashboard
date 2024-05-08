@@ -2,7 +2,7 @@ import './globals.css';
 
 import Link from 'next/link';
 import { Analytics } from '@vercel/analytics/react';
-import { Logo, SettingsIcon, EditIcon, UsersIcon, VercelLogo } from '@/components/icons';
+import { Logo, SettingsIcon, EditIcon, UsersIcon, HomeIcon } from '@/components/icons';
 import { User } from './users/user';
 import { NavItem } from './nav-item';
 
@@ -35,7 +35,7 @@ export default function RootLayout({
               <div className="flex-1 overflow-auto py-2">
                 <nav className="grid items-start px-4 text-sm font-medium">
                 <NavItem href="/">
-                    <SettingsIcon className="h-4 w-4" />
+                    <HomeIcon className="h-4 w-4" />
                     Dashboard
                   </NavItem>
                   <NavItem href="/job-composer">
