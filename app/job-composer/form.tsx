@@ -31,6 +31,9 @@ const formSchema = z.object({
   params: z.string().min(2, {
     message: "Params must be at least 2 characters.",
   }),
+  globusEndpoint: z.string().min(2, {
+    message: "Globus endpoint must be at least 2 characters.",
+  }),
 })
 
 export function JobComposerForm() {
@@ -76,7 +79,7 @@ export function JobComposerForm() {
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a verified email to display" />
+                    <SelectValue placeholder="Select a the task type" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
@@ -119,6 +122,22 @@ export function JobComposerForm() {
               </FormControl>
               <FormDescription>
                 This is your job's params.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="globusEndpoint"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Globus Endpoint</FormLabel>
+              <FormControl>
+                <Input placeholder="Globus Endpoint" {...field} />
+              </FormControl>
+              <FormDescription>
+                This is your Globus endpoint used to run the task.
               </FormDescription>
               <FormMessage />
             </FormItem>

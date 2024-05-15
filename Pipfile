@@ -5,3 +5,7 @@ name = "pypi"
  
 [requires]
 python_version = "3.12"
+
+[packages]
+globus-compute-sdk = {version = "2.19.0"}
+
