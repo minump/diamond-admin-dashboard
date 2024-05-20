@@ -6,7 +6,7 @@ export default async function JobComposerPage() {
       <div className="flex items-center">
         <h1 className="font-semibold text-lg md:text-2xl">Job Composer</h1>
       </div>
-      <div className="flex flex-2 flex-col items-center gap-2 px-8">
+      <div className="flex flex-2 flex-col items-center gap-2 px-8 w-full">
         <JobComposerForm />
       </div>
     </main>
