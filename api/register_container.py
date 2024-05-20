@@ -1,6 +1,6 @@
 from http.server import BaseHTTPRequestHandler
 import json
-from diamond_sdk import register_container as sdk_register_container
+# from diamond_sdk import register_container as sdk_register_container
 
 class handler(BaseHTTPRequestHandler):
 
@@ -16,13 +16,13 @@ class handler(BaseHTTPRequestHandler):
         work_path = data['work_path']
 
         # Call the SDK function
-        result = sdk_register_container(base_image, image_file_name, endpoint, work_path)
+        # result = sdk_register_container(base_image, image_file_name, endpoint, work_path)
 
         self.send_response(200)
         self.send_header('Content-type', 'application/json')
         self.end_headers()
         response = {
             "message": "Container registered successfully",
-            "result": result
+            # "result": result
         }
         self.wfile.write(json.dumps(response).encode('utf-8'))

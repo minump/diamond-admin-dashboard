@@ -14,7 +14,7 @@
 
 from http.server import BaseHTTPRequestHandler
 import json
-from diamond_sdk import single_node_task as sdk_single_node_task
+# from diamond_sdk import single_node_task as sdk_single_node_task
 
 class handler(BaseHTTPRequestHandler):
 
@@ -29,13 +29,13 @@ class handler(BaseHTTPRequestHandler):
         task = data['task']
 
         # Call the SDK function
-        result = sdk_single_node_task(endpoint, container_id, task)
+        # result = sdk_single_node_task(endpoint, container_id, task)
 
         self.send_response(200)
         self.send_header('Content-type', 'application/json')
         self.end_headers()
         response = {
             "message": "Single node task executed successfully",
-            "result": result
+            # "result": result
         }
         self.wfile.write(json.dumps(response).encode('utf-8'))
