@@ -13,9 +13,12 @@ from globus_compute_sdk.sdk.login_manager.manager import ComputeScopeBuilder
 
 class handler(BaseHTTPRequestHandler):
 
-    def do_POST(self, data):
+    def do_POST(self,):
+        content_length = int(self.headers['Content-Length'])
+        post_data = self.rfile.read(content_length)
+        data = json.loads(post_data.decode('utf-8'))
         globus_data_raw = os.getenv("GLOBUS_DATA")
-        tutorial_endpoint = os.getenv("GLOBUS_ENDPOINT") # Public tutorial endpoint
+        tutorial_endpoint = data['globusEndpoint'] # Public tutorial endpoint
         if globus_data_raw:
             tokens = pickle.loads(base64.b64decode(os.getenv('GLOBUS_DATA')))['tokens']
             
@@ -33,11 +36,7 @@ class handler(BaseHTTPRequestHandler):
             compute_login_manager.ensure_logged_in()
             gc = Client(login_manager=compute_login_manager, code_serialization_strategy=CombinedCode())
             gce = Executor(endpoint_id=tutorial_endpoint, client=gc)
-            result = gce.execute(
-                "python3",
-                "-c",
-                "print('Hello, world!')",
-            )
+            result = 'Hello, world!'
             print(result)
             self.send_response(200, result)
         else:

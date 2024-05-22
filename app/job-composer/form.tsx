@@ -50,7 +50,13 @@ export function JobComposerForm() {
     try {
       switch (values.taskType) {
         case 'singleNode':
-          await singleNodeTask(values);
+          const data = {
+            taskType: values.taskType,
+            jobName: values.jobName,
+            params: values.params,
+            globusEndpoint: values.globusEndpoint,
+          };
+          await singleNodeTask(data);
           break;
         case 'registerContainer':
           await registerContainer(values);
