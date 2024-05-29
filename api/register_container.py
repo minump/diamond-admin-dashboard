@@ -1,5 +1,8 @@
 from http.server import BaseHTTPRequestHandler
 import json
+import os
+
+from qdrant_client import QdrantClient
 
 from diamond.wrapper.wrapper import register_container
 
@@ -20,6 +23,15 @@ class handler(BaseHTTPRequestHandler):
         # result = sdk_register_container(base_image, image_file_name, endpoint, work_path)
         # register_container(endpoint_id: str,work_path: str,image_file_name: str,base_image: str)
         result = register_container(endpoint, work_path, image_file_name, base_image)
+
+
+        # testing with qdrant client pip package
+        # qdrant_url = os.getenv('QDRANT_URL', "localhost")
+        # qdrant_port = os.getenv('QDRANT_PORT', "6333")
+        # qdrant_client = QdrantClient(url=qdrant_url, port=qdrant_port, timeout=300)
+        # collection_name = os.getenv('QDRANT_COLLECTION_NAME', "collection")
+        # result = qdrant_client.collection_exists(collection_name)
+        # print(f"Collection {collection_name} exists: {result}")
 
         self.send_response(200, result)
         self.send_header('Content-type', 'application/json')
