@@ -1,3 +1,2 @@
-globus-compute-sdk
-flask
+fastapi
 diamond-hpc

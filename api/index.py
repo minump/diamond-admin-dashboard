@@ -1,16 +1,23 @@
-from flask import ( Flask, request, jsonify,  make_response, Request, Response)
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
 from diamond.wrapper.wrapper import register_container
-app = Flask(__name__)
 
-@app.route('/api/register_container', methods=['POST'])
-def registerContainer():
-	request_data = request.get_json()
-	base_image = request_data['base_image']
-	image_file_name = request_data['image_file_name']
-	endpoint = request_data['endpoint']
-	work_path = request_data['work_path']
-	register_container(endpoint_id=endpoint, work_path=work_path,base_image=base_image,image_file_name=image_file_name)
-	return jsonify({"message": "Container registered successfully"})
+app = FastAPI()
+
+class Container(BaseModel):
+    base_image: str
+    image_file_name: str
+    endpoint: str
+    work_path: str
+
+@app.post('/api/register_container')
+async def register_container_api(container: Container):
+    try:
+        register_container(endpoint_id=container.endpoint, work_path=container.work_path, base_image=container.base_image, image_file_name=container.image_file_name)
+        return {"message": "Container registered successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 if __name__ == '__main__':
-	app.run(port=5328)
+    import uvicorn
+    uvicorn.run(app, host="127.0.0.1", port=5328)
