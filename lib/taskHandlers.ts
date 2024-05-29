@@ -21,7 +21,7 @@ export async function singleNodeTask(data: any) {
 
 export async function registerContainer(data: any) {
   try {
-    const response = await fetch(`${process.env.VERCEL_URL}/api/register_container`, {
+    const response = await fetch(`/api/register_container`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
