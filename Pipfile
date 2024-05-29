@@ -8,4 +8,4 @@ python_version = "3.12"
 
 [packages]
 globus-compute-sdk = {version = "2.19.0"}
-
+qdrant-client = {version = "1.8.0"}
