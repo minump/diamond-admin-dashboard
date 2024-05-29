@@ -151,6 +151,16 @@ export function JobComposerForm() {
           <>
             <FormField
               control={form.control}
+              name="endpoint"
+              render={({ field }) => (
+                <FormItem className="w-[60%] md:w-[20%]">
+                  <FormLabel>Endpoint ID</FormLabel>
+                  <Input placeholder="Globus Endpoint ID" {...field} />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
               name="base_image"
               render={({ field }) => (
                 <FormItem className="w-[60%] md:w-[20%]">

@@ -5,3 +5,5 @@ name = "pypi"
  
 [requires]
 python_version = "3.12"
+diamond-hpc = {version = "0.0.2"}
+
