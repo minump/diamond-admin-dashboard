@@ -56,3 +56,9 @@ export async function multiNodeTask(data: any) {
     console.error('Error in multiNodeTask:', error);
   }
 }
+
+export async function getOAuth2UrlAndLogin() {
+  const response = await fetch(`/api/get_oauth2_url_and_login`);
+  const data = await response.json();
+  return data;
+}
