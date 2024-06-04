@@ -8,6 +8,6 @@ python_version = "3.12"
 diamond-hpc = {version = "0.0.2"}
 
 [packages]
-diamond-hpc = "*"
+diamond-hpc = "==0.0.5"
 fastapi = "*"
 globus-compute-sdk = "*"

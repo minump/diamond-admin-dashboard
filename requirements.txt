@@ -1,2 +1,2 @@
 fastapi
-diamond-hpc
+diamond-hpc==0.0.5
