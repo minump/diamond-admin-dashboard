@@ -58,7 +58,12 @@ export async function multiNodeTask(data: any) {
 }
 
 export async function getOAuth2UrlAndLogin() {
-  const response = await fetch(`/api/get_oauth2_url_and_login`);
+  const response = await fetch(`/api/get_oauth2_url_and_login`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
   const data = await response.json();
   return data;
 }
