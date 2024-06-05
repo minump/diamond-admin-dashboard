@@ -1,0 +1,11 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[requires]
+python_version = "3.12"
+diamond-hpc = {version = "0.0.5"}
+
+[packages]
+diamond-hpc = "==0.0.5"
