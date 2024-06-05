@@ -12,8 +12,8 @@ const GlobusProvider: OAuth2Config<any> = {
     params: {
       access_type: "offline",
       response_type: "code",
+    },
 
-    }
   },
   // accessTokenUrl: "https://auth.globus.org/v2/oauth2/token",
   // requestTokenUrl: "https://auth.globus.org/v2/oauth2/auth",
@@ -29,8 +29,8 @@ const GlobusProvider: OAuth2Config<any> = {
       image: profile.picture,
     };
   },
-  clientId: process.env.GLOBUS_CLIENT_ID,
-  clientSecret: process.env.GLOBUS_CLIENT_SECRET,
+  clientId: process.env.DIAMOND_CLIENT_ID,
+  clientSecret: process.env.DIAMOND_CLIENT_SECRET,
 };
 
 export const {
@@ -42,6 +42,7 @@ export const {
   providers: [GlobusProvider],
   callbacks: {
     async signIn({ user, account, profile, email, credentials }) {
+      console.log('triggered signIn callback')
       return true; // Additional sign-in logic can go here
     },
     async redirect({ url, baseUrl }) {
@@ -52,6 +53,6 @@ export const {
     },
     async jwt({ token, user, account, profile, isNewUser }) {
       return token; // Additional JWT logic can go here
-    }
+    },
   }
 });

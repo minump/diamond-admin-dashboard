@@ -5,9 +5,7 @@ name = "pypi"
 
 [requires]
 python_version = "3.12"
-diamond-hpc = {version = "0.0.2"}
+diamond-hpc = {version = "0.0.5"}
 
 [packages]
 diamond-hpc = "==0.0.5"
-fastapi = "*"
-globus-compute-sdk = "*"

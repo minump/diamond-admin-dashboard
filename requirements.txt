@@ -1,2 +1,1 @@
-fastapi
-diamond-hpc==0.0.5
+diamond-hpc

@@ -1,8 +1,9 @@
 import { Button } from '@/components/ui/button';
+import { ReactNode } from 'react';
 
-const AuthenticateButton = ( { onClick }: { onClick: () => void }) => {
+const AuthenticateButton = ( { onClick, children }: { onClick: () => void, children: ReactNode }) => {
   return (
-    <Button onClick={onClick}>Authenticate</Button>
+    <Button onClick={onClick}>{children}</Button>
   );
 };
 
