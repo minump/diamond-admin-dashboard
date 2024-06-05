@@ -2,8 +2,8 @@ import './globals.css';
 
 import Link from 'next/link';
 import { Analytics } from '@vercel/analytics/react';
-import { Logo, SettingsIcon, UsersIcon, VercelLogo } from '@/components/icons';
-import { User } from './user';
+import { Logo, SettingsIcon, EditIcon, UsersIcon, HomeIcon } from '@/components/icons';
+import { User } from './users/user';
 import { NavItem } from './nav-item';
 
 export const metadata = {
@@ -29,22 +29,26 @@ export default function RootLayout({
                   href="/"
                 >
                   <Logo />
-                  <span className="">ACME</span>
+                  <span className="">DIAMOND</span>
                 </Link>
               </div>
               <div className="flex-1 overflow-auto py-2">
                 <nav className="grid items-start px-4 text-sm font-medium">
                   <NavItem href="/">
+                    <HomeIcon className="h-4 w-4" />
+                    Dashboard
+                  </NavItem>
+                  <NavItem href="/job-composer">
+                    <EditIcon className="h-4 w-4" />
+                    Job Composer
+                  </NavItem>
+                  <NavItem href="/users">
                     <UsersIcon className="h-4 w-4" />
                     Users
                   </NavItem>
                   <NavItem href="/settings">
                     <SettingsIcon className="h-4 w-4" />
                     Settings
-                  </NavItem>
-                  <NavItem href="https://vercel.com/templates/next.js/admin-dashboard-tailwind-postgres-react-nextjs">
-                    <VercelLogo className="h-4 w-4" />
-                    Deploy
                   </NavItem>
                 </nav>
               </div>
@@ -57,7 +61,7 @@ export default function RootLayout({
                 href="/"
               >
                 <Logo />
-                <span className="">ACME</span>
+                <span className="">DIAMOND</span>
               </Link>
               <User />
             </header>
