@@ -10,6 +10,12 @@ from utils.utils import load_portal_client, get_safe_redirect
 app = Flask(__name__)
 
 
+@app.route('/', methods=['GET'])
+def home():
+    """Home page - play with it if you must!"""
+    return "Globus Home route"
+
+
 @app.route('/signup', methods=['GET'])
 def signup():
     """Send the user to Globus Auth with signup=1."""
