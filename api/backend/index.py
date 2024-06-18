@@ -3,11 +3,8 @@ from diamond.wrapper.wrapper import register_container
 from globus_sdk import (RefreshTokenAuthorizer, TransferAPIError,
                         TransferClient, TransferData)
 from utils.decorators import authenticated
-from utils.database import database
-from utils.utils import load_portal_client, get_safe_redirect
 
-
-app = Flask(__name__)
+from . import app, database
 
 
 @app.route('/', methods=['GET'])

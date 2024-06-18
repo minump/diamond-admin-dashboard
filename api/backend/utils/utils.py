@@ -6,9 +6,9 @@ import globus_sdk
 try:
     from urllib.parse import urlparse, urljoin
 except ImportError:
-    from urlparse import urlparse, urljoin
+    from urllib.parse import urlparse, urljoin
 
-from portal import app
+from . import app
 
 
 def load_portal_client():

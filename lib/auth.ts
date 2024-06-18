@@ -1,12 +1,16 @@
-import NextAuth from 'next-auth';
-import GitHub from 'next-auth/providers/github';
+   import { useRouter } from "next/router";
 
-export const {
-  handlers: { GET, POST },
-  auth,
-  signIn,
-  signOut
-} = NextAuth({
-  providers: [GitHub]
-});
+   // Functions to handle redirection to Flask app's authentication endpoints
+   const router = useRouter();
 
+   export function signIn() {
+     router.push('http://localhost:5328/login');
+   }
+
+   export function signOut() {
+     router.push('http://localhost:5328/logout');
+   }
+
+   export function auth() {
+     router.push('http://localhost:5328/');
+   }
