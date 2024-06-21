@@ -2,8 +2,8 @@ from flask import ( Flask, request, jsonify,  make_response, Request, Response, 
 from diamond.wrapper.wrapper import register_container
 from globus_sdk import (RefreshTokenAuthorizer, TransferAPIError,
                         TransferClient, TransferData)
-from utils.decorators import authenticated
-from utils.utils import load_portal_client, get_safe_redirect
+from api.backend.utils.decorators import authenticated
+from api.backend.utils.utils import load_portal_client, get_safe_redirect
 
 from . import app, database
 

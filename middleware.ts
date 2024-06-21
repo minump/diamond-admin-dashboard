@@ -7,7 +7,8 @@ export function middleware(request: NextRequest) {
   // Check if the session cookie is not present and the path is not related to auth
   if (!sessionCookie && !request.nextUrl.pathname.startsWith('/api')) {
     // signIn();
-    NextResponse.redirect('http://localhost:5328/login');
+    //return NextResponse.redirect(new URL('/login', request.url))
+    return NextResponse.redirect('http://localhost:5328/login');
   }
 
   return NextResponse.next();

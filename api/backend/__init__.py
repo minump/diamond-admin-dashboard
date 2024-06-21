@@ -15,7 +15,7 @@ app.wsgi_app = ProxyFix(
     app.wsgi_app, x_for=1, x_proto=1, x_host=1
 )
 
-# app.config.from_pyfile('portal.conf')
+app.config.from_pyfile('diamond.conf')
 
 database = Database(app)
 

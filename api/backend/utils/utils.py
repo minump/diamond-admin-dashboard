@@ -8,13 +8,13 @@ try:
 except ImportError:
     from urllib.parse import urlparse, urljoin
 
-from . import app
+from api.backend import app
 
 
 def load_portal_client():
     """Create an AuthClient for the portal"""
     return globus_sdk.ConfidentialAppAuthClient(
-        app.config['PORTAL_CLIENT_ID'], app.config['PORTAL_CLIENT_SECRET'])
+        app.config['DIAMOND_CLIENT_ID'], app.config['DIAMOND_CLIENT_SECRET'])
 
 
 def is_safe_redirect_url(target):
@@ -40,7 +40,7 @@ def get_safe_redirect():
 
 
 def get_portal_tokens(
-        scopes=['openid', 'urn:globus:auth:scope:demo-resource-server:all', 'urn:globus:auth:scope:demo-resource-server:all[https://auth.globus.org/scopes/' + app.config['GRAPH_ENDPOINT_ID'] + '/https]']):
+        scopes=['openid', 'urn:globus:auth:scope:demo-resource-server:all', 'urn:globus:auth:scope:demo-resource-server:all[https://auth.globus.org/scopes/' + "app.config['GRAPH_ENDPOINT_ID']" + '/https]']):
     """
     Uses the client_credentials grant to get access tokens on the
     Portal's "client identity."
