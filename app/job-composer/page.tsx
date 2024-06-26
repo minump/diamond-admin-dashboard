@@ -1,4 +1,4 @@
-import { JobComposerForm } from "./form";
+import { JobComposerForm } from './form';
 
 export default async function JobComposerPage() {
   return (

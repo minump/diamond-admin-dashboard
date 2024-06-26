@@ -1,9 +1,9 @@
-"use client"
+'use client';
 
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
-import { Button } from "@/components/ui/button"
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
@@ -11,31 +11,35 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
+  FormMessage
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue
-} from "@/components/ui/select"
+} from '@/components/ui/select';
 // Assuming these are the functions that interface with your backend to execute the tasks
-import { singleNodeTask, registerContainer, multiNodeTask } from "@/lib/taskHandlers"
-import { Textarea } from "@/components/ui/textarea"
+import {
+  singleNodeTask,
+  registerContainer,
+  multiNodeTask
+} from '@/lib/taskHandlers';
+import { Textarea } from '@/components/ui/textarea';
 
 const formSchema = z.object({
   taskType: z.enum(['singleNode', 'registerContainer', 'multiNode']),
   jobName: z.string().min(2, {
-    message: "Job name must be at least 2 characters.",
+    message: 'Job name must be at least 2 characters.'
   }),
   endpoint: z.string().optional(),
   container_id: z.string().optional(),
   task: z.string().optional(),
   base_image: z.string().optional(),
   image_file_name: z.string().optional(),
-  work_path: z.string().optional(),
+  work_path: z.string().optional()
 });
 
 export function JobComposerForm() {
@@ -43,9 +47,9 @@ export function JobComposerForm() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       taskType: 'singleNode',
-      jobName: "registerContainer",
-    },
-  })
+      jobName: 'registerContainer'
+    }
+  });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
@@ -100,7 +104,9 @@ export function JobComposerForm() {
                 </FormControl>
                 <SelectContent>
                   <SelectItem value="singleNode">Single Node Task</SelectItem>
-                  <SelectItem value="registerContainer">Register Container Task</SelectItem>
+                  <SelectItem value="registerContainer">
+                    Register Container Task
+                  </SelectItem>
                   <SelectItem value="multiNode">Multi Node Task</SelectItem>
                 </SelectContent>
               </Select>
@@ -194,40 +200,40 @@ export function JobComposerForm() {
 
         {form.watch('taskType') === 'multiNode' && (
           <>
-          <FormField
-            control={form.control}
-            name="endpoint"
-            render={({ field }) => (
-              <FormItem className="w-[60%] md:w-[20%]">
-                <FormLabel>Endpoint</FormLabel>
-                <Input placeholder="Endpoint URL" {...field} />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="container_id"
-            render={({ field }) => (
-              <FormItem className="w-[60%] md:w-[20%]">
-                <FormLabel>Container ID</FormLabel>
-                <Input placeholder="Container ID" {...field} />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="task"
-            render={({ field }) => (
-              <FormItem className="w-[80%] md:w-[50%]">
-                <FormLabel>Task</FormLabel>
-                <Textarea placeholder="Task details" {...field} />
-              </FormItem>
-            )}
-          />
-        </>
+            <FormField
+              control={form.control}
+              name="endpoint"
+              render={({ field }) => (
+                <FormItem className="w-[60%] md:w-[20%]">
+                  <FormLabel>Endpoint</FormLabel>
+                  <Input placeholder="Endpoint URL" {...field} />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="container_id"
+              render={({ field }) => (
+                <FormItem className="w-[60%] md:w-[20%]">
+                  <FormLabel>Container ID</FormLabel>
+                  <Input placeholder="Container ID" {...field} />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="task"
+              render={({ field }) => (
+                <FormItem className="w-[80%] md:w-[50%]">
+                  <FormLabel>Task</FormLabel>
+                  <Textarea placeholder="Task details" {...field} />
+                </FormItem>
+              )}
+            />
+          </>
         )}
         <Button type="submit">Submit</Button>
       </form>
     </Form>
-  )
+  );
 }

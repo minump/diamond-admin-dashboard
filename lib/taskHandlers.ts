@@ -1,13 +1,11 @@
-
-
 export async function singleNodeTask(data: any) {
   try {
     const response = await fetch(`/api/single_node_task`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/json'
       },
-      body: JSON.stringify(data),
+      body: JSON.stringify(data)
     });
     if (!response.ok) {
       throw new Error('Network response was not ok');
@@ -24,9 +22,9 @@ export async function registerContainer(data: any) {
     const response = await fetch(`/api/register_container`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/json'
       },
-      body: JSON.stringify(data),
+      body: JSON.stringify(data)
     });
     if (!response.ok) {
       throw new Error('Network response was not ok');
@@ -40,13 +38,16 @@ export async function registerContainer(data: any) {
 
 export async function multiNodeTask(data: any) {
   try {
-    const response = await fetch(`${process.env.VERCEL_URL}/api/multi_node_task`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
+    const response = await fetch(
+      `${process.env.VERCEL_URL}/api/multi_node_task`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      }
+    );
     if (!response.ok) {
       throw new Error('Network response was not ok');
     }

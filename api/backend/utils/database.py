@@ -1,6 +1,8 @@
 """Manage access to the database."""
 
+import os
 import sqlite3
+
 from flask import g
 
 
@@ -14,18 +16,33 @@ class Database:
         @app.teardown_appcontext
         def close_connection(exception):
             """Close database connection when finished handling request."""
-            db = getattr(g, '_database', None)
+            db = getattr(g, "_database", None)
 
             if db is not None:
                 db.close()
 
+    def ensure_tables_exist(self):
+        """Ensure all required tables are created."""
+        db = self.get_db()
+        db.execute(
+            """
+						CREATE TABLE IF NOT EXISTS profile (
+								identity_id INTEGER PRIMARY KEY,
+								name TEXT,
+								email TEXT,
+								institution TEXT
+						)
+				"""
+        )
+        db.commit()
+
     def connect_to_db(self):
         """Open database and return a connection handle."""
-        return sqlite3.connect(self.app.config['DATABASE'])
+        return sqlite3.connect(os.environ["DATABASE"])
 
     def get_db(self):
         """Return the app global db connection or create one."""
-        db = getattr(g, '_database', None)
+        db = getattr(g, "_database", None)
 
         if db is None:
             db = g._database = self.connect_to_db()
@@ -42,26 +59,28 @@ class Database:
 
         return (rv[0] if rv else None) if one else rv
 
-    def save_profile(self,
-                     identity_id=None,
-                     name=None,
-                     email=None,
-                     institution=None):
+    def save_profile(self, identity_id=None, name=None, email=None, institution=None):
         """Persist user profile."""
         db = self.get_db()
 
-        db.execute("""update profile set name = ?, email = ?, institution = ?
-                   where identity_id = ?""",
-                   (name, email, institution, identity_id))
+        db.execute(
+            """update profile set name = ?, email = ?, institution = ?
+									 where identity_id = ?""",
+            (name, email, institution, identity_id),
+        )
 
-        db.execute("""insert into profile (identity_id, name, email, institution)
-                   select ?, ?, ?, ? where changes() = 0""",
-                   (identity_id, name, email, institution))
+        db.execute(
+            """insert into profile (identity_id, name, email, institution)
+									 select ?, ?, ?, ? where changes() = 0""",
+            (identity_id, name, email, institution),
+        )
         db.commit()
 
     def load_profile(self, identity_id):
         """Load user profile."""
-        return self.query_db("""select name, email, institution from profile
-                             where identity_id = ?""",
-                             [identity_id],
-                             one=True)
+        return self.query_db(
+            """select name, email, institution from profile
+														 where identity_id = ?""",
+            [identity_id],
+            one=True,
+        )

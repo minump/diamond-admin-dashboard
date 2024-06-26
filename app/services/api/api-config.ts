@@ -6,13 +6,13 @@
 //      * The URL of the api.
 //      */
 //     url: string;
-  
+
 //     /**
 //      * Milliseconds before we timeout the request.
 //      */
 //     timeout: number;
 //   }
-  
+
 //   /**
 //    * The default configuration for the app.
 //    */
@@ -20,4 +20,3 @@
 //     url: process.env.API_URL || 'http://localhost', // Provide a default URL
 //     timeout: 30000
 //   };
-  
