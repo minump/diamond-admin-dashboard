@@ -10,12 +10,13 @@ import {
   HomeIcon
 } from '@/components/icons';
 // import { User } from './users/user';
+import DashboardPage from './page';
 import { NavItem } from './nav-item';
 
 export const metadata = {
-  title: 'Next.js App Router + NextAuth + Tailwind CSS',
+  title: 'Diamond Admin Dashboard',
   description:
-    'A user admin dashboard configured with Next.js, Postgres, NextAuth, Tailwind CSS, TypeScript, and Prettier.'
+    'Diamond admin dashboard configured with Flask server backend, SQLite database, Next.js, Tailwind CSS, TypeScript, and Prettier.'
 };
 
 export default function RootLayout({
