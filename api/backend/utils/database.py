@@ -2,8 +2,16 @@
 
 import os
 import sqlite3
+import logging
 
 from flask import g
+
+# create and configure logger
+logging.basicConfig(level=logging.INFO, datefmt='%Y-%m-%dT%H:%M:%S',
+                    format='%(asctime)-15s.%(msecs)03dZ %(levelname)-7s : %(name)s - %(message)s',
+                    handlers=[logging.FileHandler("llm.log"), logging.StreamHandler(sys.stdout)])
+# create log object with current module name
+log = logging.getLogger(__name__)
 
 
 class Database:
@@ -27,9 +35,9 @@ class Database:
         db.execute(
             """
 						CREATE TABLE IF NOT EXISTS profile (
-								identity_id INTEGER PRIMARY KEY,
-								name TEXT,
-								email TEXT,
+								identity_id VARCHAR(255) PRIMARY KEY,
+								name VARCHAR(255),
+								email VARCHAR(255),
 								institution TEXT
 						)
 				"""
@@ -52,6 +60,7 @@ class Database:
 
     def query_db(self, query, args=(), one=False):
         """Query the database."""
+        log.info(f"Querying database: {query}")
         cur = self.get_db().execute(query, args)
 
         rv = cur.fetchall()
@@ -61,7 +70,14 @@ class Database:
 
     def save_profile(self, identity_id=None, name=None, email=None, institution=None):
         """Persist user profile."""
+        log.info(f"Saving profile: {name}, {email}, {institution}")
         db = self.get_db()
+        # Ensure the data types are correct, convert if necessary
+
+        identity_id = str(identity_id) if identity_id is not None else None
+        name = str(name) if name is not None else None
+        email = str(email) if email is not None else None
+        institution = str(institution) if institution is not None else None
 
         db.execute(
             """update profile set name = ?, email = ?, institution = ?
@@ -78,6 +94,7 @@ class Database:
 
     def load_profile(self, identity_id):
         """Load user profile."""
+        log.info(f"Loading profile: {identity_id}")
         return self.query_db(
             """select name, email, institution from profile
 														 where identity_id = ?""",

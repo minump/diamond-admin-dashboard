@@ -1,4 +1,5 @@
 import os
+import logging
 
 from diamond.wrapper.wrapper import register_container
 from flask import flash, jsonify, make_response, redirect, request, session, url_for
@@ -7,6 +8,13 @@ from api.backend.utils.decorators import authenticated
 from api.backend.utils.utils import get_safe_redirect, load_portal_client
 
 from . import app, database
+
+# create and configure logger
+logging.basicConfig(level=logging.INFO, datefmt='%Y-%m-%dT%H:%M:%S',
+                    format='%(asctime)-15s.%(msecs)03dZ %(levelname)-7s : %(name)s - %(message)s',
+                    handlers=[logging.FileHandler("llm.log"), logging.StreamHandler(sys.stdout)])
+# create log object with current module name
+log = logging.getLogger(__name__)
 
 
 @app.route("/", methods=["GET"])
@@ -51,7 +59,7 @@ def logout():
 
     # Destroy the session state
     session.clear()
-    print("session after clearing: ", session)
+    log.info(f"Session after clearing: {session}")
 
     redirect_uri = url_for("home", _external=True)
 
@@ -69,10 +77,11 @@ def logout():
 @authenticated
 def profile():
     """User profile information. Assocated with a Globus Auth identity."""
+    log.info("profile route")
     if request.method == "GET":
         identity_id = session.get("primary_identity")
         profile = database.load_profile(identity_id)
-        print("profile: ", profile)
+        log.info(f"Profile: {profile}")
 
         if profile:
             name, email, institution = profile
@@ -86,7 +95,22 @@ def profile():
         if request.args.get("next"):
             session["next"] = get_safe_redirect()
 
-        print("session: ", session)
+        log.info(f"Session: {session}")
+
+        if not profile and session.get("is_authenticated") == True:
+            identity_id = session["primary_identity"]
+            name = session["name"] 
+            email = session["email"]
+            institution = session["institution"]
+            database.save_profile(
+                identity_id=identity_id,
+                name=name,
+                email=email,
+                institution=institution,
+            )
+
+            flash("Thank you! Your profile has been successfully updated.")
+            return redirect(url_for("profile"))
         # return jsonify(
         #     {
         #         "name": session["name"],
@@ -96,7 +120,7 @@ def profile():
         # )
         # return render_template("profile.jinja2")
         # Redirect to localhost:3000/profile
-        response = make_response(redirect("http://localhost:3000/profile"))
+        response = make_response(redirect("http://localhost:3000/"))
         response.set_cookie("primary_identity", session["primary_identity"])
         response.set_cookie("name", session["name"])
         response.set_cookie("email", session["email"])
@@ -106,7 +130,6 @@ def profile():
         name = session["name"] = request.form["name"]
         email = session["email"] = request.form["email"]
         institution = session["institution"] = request.form["institution"]
-        print("saving profile in database")
         database.save_profile(
             identity_id=session["primary_identity"],
             name=name,
@@ -184,8 +207,9 @@ def authcallback():
             session["name"] = name
             session["email"] = email
             session["institution"] = institution
+            return redirect(url_for("profile"))
         else:
-            print("profile not found, creating...")
+            log.info("profile not found, creating...")
             return redirect(
                 url_for(
                     "profile",
@@ -197,7 +221,11 @@ def authcallback():
                 code=307,
             )
 
-        return redirect(url_for("profile"))
+
+@app.route("/loadprofile", methods=["GET"])
+def loadprofile():
+    log.info("loadprofile route")
+    return redirect(url_for("profile"))
 
 
 @app.route("/api/register_container", methods=["POST"])
