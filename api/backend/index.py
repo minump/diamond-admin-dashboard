@@ -11,8 +11,7 @@ from . import app, database
 
 # create and configure logger
 logging.basicConfig(level=logging.INFO, datefmt='%Y-%m-%dT%H:%M:%S',
-                    format='%(asctime)-15s.%(msecs)03dZ %(levelname)-7s : %(name)s - %(message)s',
-                    handlers=[logging.FileHandler("llm.log"), logging.StreamHandler(sys.stdout)])
+                    format='%(asctime)-15s.%(msecs)03dZ %(levelname)-7s : %(name)s - %(message)s')
 # create log object with current module name
 log = logging.getLogger(__name__)
 
