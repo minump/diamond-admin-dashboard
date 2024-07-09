@@ -1,14 +1,17 @@
 """Manage access to the database."""
 
+import logging
 import os
 import sqlite3
-import logging
 
 from flask import g
 
 # create and configure logger
-logging.basicConfig(level=logging.INFO, datefmt='%Y-%m-%dT%H:%M:%S',
-                    format='%(asctime)-15s.%(msecs)03dZ %(levelname)-7s : %(name)s - %(message)s')
+logging.basicConfig(
+    level=logging.INFO,
+    datefmt="%Y-%m-%dT%H:%M:%S",
+    format="%(asctime)-15s.%(msecs)03dZ %(levelname)-7s : %(name)s - %(message)s",
+)
 # create log object with current module name
 log = logging.getLogger(__name__)
 

@@ -20,7 +20,7 @@ def authenticated(fn):
             or not session.get("institution")
         ) and request.path != "/profile":
             return redirect(url_for("profile", next=request.url))
-        
+
         if request.path == "/profile" and request.method == "POST":
             return redirect(url_for("profile"), code=307)
 

@@ -2,7 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from './lib/auth';
 
 export function middleware(request: NextRequest) {
-  if (request.nextUrl.pathname.endsWith('/login') || request.nextUrl.pathname.endsWith('/logout')) {
+  if (
+    request.nextUrl.pathname.endsWith('/login') ||
+    request.nextUrl.pathname.endsWith('/logout')
+  ) {
     return auth(request);
   }
   return NextResponse.next();

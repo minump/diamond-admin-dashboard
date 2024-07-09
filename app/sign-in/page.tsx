@@ -15,9 +15,7 @@ export default function SignInPage() {
       }}
     >
       {sessionData.primaryIdentity.length > 0 ? (
-        <div className={'p-4 text-green-500'}>
-          You are logged in
-        </div>
+        <div className={'p-4 text-green-500'}>You are logged in</div>
       ) : (
         <>
           <div className={'p-4 text-red-500'}>
@@ -32,7 +30,6 @@ export default function SignInPage() {
           </div>
         </>
       )}
-    
     </div>
   );
 }
