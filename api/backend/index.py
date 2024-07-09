@@ -1,6 +1,7 @@
-import os
 import logging
+import os
 
+import requests
 from diamond.wrapper.wrapper import register_container
 from flask import flash, jsonify, make_response, redirect, request, session, url_for
 
@@ -10,8 +11,11 @@ from api.backend.utils.utils import get_safe_redirect, load_portal_client
 from . import app, database
 
 # create and configure logger
-logging.basicConfig(level=logging.INFO, datefmt='%Y-%m-%dT%H:%M:%S',
-                    format='%(asctime)-15s.%(msecs)03dZ %(levelname)-7s : %(name)s - %(message)s')
+logging.basicConfig(
+    level=logging.INFO,
+    datefmt="%Y-%m-%dT%H:%M:%S",
+    format="%(asctime)-15s.%(msecs)03dZ %(levelname)-7s : %(name)s - %(message)s",
+)
 # create log object with current module name
 log = logging.getLogger(__name__)
 
@@ -98,7 +102,7 @@ def profile():
 
         if not profile and session.get("is_authenticated") == True:
             identity_id = session["primary_identity"]
-            name = session["name"] 
+            name = session["name"]
             email = session["email"]
             institution = session["institution"]
             database.save_profile(
@@ -209,16 +213,23 @@ def authcallback():
             return redirect(url_for("profile"))
         else:
             log.info("profile not found, creating...")
-            return redirect(
-                url_for(
-                    "profile",
-                    name=session["name"],
-                    email=session["email"],
-                    institution=session["institution"],
-                    identity_id=session["primary_identity"],
-                ),
-                code=307,
-            )
+
+            # Create a mock form with the necessary data
+            form_data = {
+                "name": session["name"],
+                "email": session["email"],
+                "institution": session["institution"],
+                "identity_id": session["primary_identity"],
+            }
+
+            # Send a POST request to the profile creation endpoint
+            response = requests.post(url_for("profile", _external=True), json=form_data)
+
+            if response.status_code == 200:
+                return redirect(url_for("profile"))
+            else:
+                log.error("Failed to create profile")
+                return "Error creating profile", 500
 
 
 @app.route("/loadprofile", methods=["GET"])

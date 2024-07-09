@@ -13,7 +13,7 @@ except ImportError:
 def load_portal_client():
     """Create an AuthClient for the portal"""
     return globus_sdk.ConfidentialAppAuthClient(
-        os.environ["DIAMOND_CLIENT_ID"], os.environ["DIAMOND_CLIENT_SECRET"]
+        os.environ["PORTAL_CLIENT_ID"], os.environ["PORTAL_CLIENT_SECRET"]
     )
 
 
