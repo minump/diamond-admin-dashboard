@@ -1,0 +1,49 @@
+name: diamond-frontend
+
+networks:
+  default:
+    name: diamond-frontend-network
+
+services:
+
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    volumes:
+      - ./api:/src
+    networks:
+      - default
+    ports:
+      - 5328:5328
+  
+  client:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    volumes:
+      - ./:/src
+      - /src/node_modules/
+    networks:
+      - default
+    ports:
+      - 3000:3000
+    depends_on:
+      - api
+  
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+    restart: unless-stopped
+    depends_on:
+      - api
+      - client
+    networks:
+      - default
