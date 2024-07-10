@@ -38,12 +38,33 @@ def login():
     return redirect(url_for("authcallback"))
 
 
+@app.route(
+    "/is_authenticated",
+    methods=["GET"],
+)
+@authenticated
+def is_authenticated():
+    # log.info(f"cookies in backend: {request.cookies}")
+    # log.info(f"session in backend: {session}")
+    return jsonify({"is_authenticated": True})
+
+
+# Todo:
+# @app.route("/diamond-endpoint-register-container", methods=["POST"])
+# @authenticated
+# def diamond_endpoint_register_container():
+#     # Todo Call diamond sdk register container
+#
+#     # return jsonify(response)
+
+
 @app.route("/logout", methods=["GET"])
 @authenticated
 def logout():
     """
     - Revoke the tokens with Globus Auth.
     - Destroy the session state.
+    - Remove cookies containing 'tokens'.
     - Redirect the user to the Globus Auth logout page.
     """
     client = load_portal_client()
@@ -62,6 +83,11 @@ def logout():
 
     # Destroy the session state
     session.clear()
+
+    # Remove cookies containing 'tokens'
+    response = make_response(redirect(url_for("home", _external=True)))
+    response.delete_cookie("tokens")
+
     log.info(f"Session after clearing: {session}")
 
     redirect_uri = url_for("home", _external=True)
@@ -73,7 +99,8 @@ def logout():
     ga_logout_url.append("&redirect_name=Diamond Service")
 
     # Redirect the user to the Globus Auth logout page
-    return redirect("".join(ga_logout_url))
+    response.headers["Location"] = "".join(ga_logout_url)
+    return response
 
 
 @app.route("/profile", methods=["GET", "POST"])
@@ -124,10 +151,13 @@ def profile():
         # return render_template("profile.jinja2")
         # Redirect to localhost:3000/profile
         response = make_response(redirect("http://localhost:3000/"))
+        response.set_cookie("is_authenticated", "true")
+        response.set_cookie("primary_username", session["primary_username"])
         response.set_cookie("primary_identity", session["primary_identity"])
         response.set_cookie("name", session["name"])
         response.set_cookie("email", session["email"])
         response.set_cookie("institution", session["institution"])
+        response.set_cookie("tokens", str(session["tokens"]))
         return response
     elif request.method == "POST":
         name = session["name"] = request.form["name"]
@@ -210,6 +240,7 @@ def authcallback():
             session["name"] = name
             session["email"] = email
             session["institution"] = institution
+            log.info("profile found redirecting to profile... GET")
             return redirect(url_for("profile"))
         else:
             log.info("profile not found, creating...")
@@ -225,6 +256,7 @@ def authcallback():
             # Send a POST request to the profile creation endpoint
             response = requests.post(url_for("profile", _external=True), json=form_data)
 
+            log.info("POST profile call done, redirecting to profile... GET")
             if response.status_code == 200:
                 return redirect(url_for("profile"))
             else:

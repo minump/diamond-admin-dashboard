@@ -83,13 +83,14 @@ class Database:
 
         db.execute(
             """update profile set name = ?, email = ?, institution = ?
-									 where identity_id = ?""",
+									 where identity_id = ? on conflict(identity_id) do update set
+                                    name = excluded.name, email = excluded.email, institution = excluded.institution""",
             (name, email, institution, identity_id),
         )
 
         db.execute(
-            """insert into profile (identity_id, name, email, institution)
-									 select ?, ?, ?, ? where changes() = 0""",
+            """insert or replace into profile (identity_id, name, email, institution)
+               values (?, ?, ?, ?)""",
             (identity_id, name, email, institution),
         )
         db.commit()

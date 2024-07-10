@@ -1,14 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from './lib/auth';
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   if (
-    request.nextUrl.pathname.endsWith('/login') ||
-    request.nextUrl.pathname.endsWith('/logout')
+    request.nextUrl.pathname.endsWith('/sign-in')
+    //   request.nextUrl.pathname.endsWith('/logout')
   ) {
-    return auth(request);
+    console.log('Redirecting to Sign in...');
+    return NextResponse.next();
   }
-  return NextResponse.next();
+  console.log('authenticating... from middleware.ts with ');
+  return await auth(request);
 }
 
 export const config = {

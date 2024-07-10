@@ -2,3 +2,4 @@ globus-compute-sdk
 flask
 diamond-hpc
 python-dotenv
+flask-cors
