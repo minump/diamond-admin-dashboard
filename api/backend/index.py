@@ -19,11 +19,14 @@ logging.basicConfig(
 # create log object with current module name
 log = logging.getLogger(__name__)
 
+FRONTEND_URL = os.environ.get("FRONTEND_URL", "http://localhost:3000")
+
 
 @app.route("/", methods=["GET"])
 def home():
     """Home route."""
-    return redirect("http://localhost:3000/sign-in")
+
+    return redirect(f"{FRONTEND_URL}/sign-in")
 
 
 @app.route("/signup", methods=["GET"])
@@ -150,7 +153,7 @@ def profile():
         # )
         # return render_template("profile.jinja2")
         # Redirect to localhost:3000/profile
-        response = make_response(redirect("http://localhost:3000/"))
+        response = make_response(redirect(f"{FRONTEND_URL}"))
         response.set_cookie("is_authenticated", "true")
         response.set_cookie("primary_username", session["primary_username"])
         response.set_cookie("primary_identity", session["primary_identity"])
