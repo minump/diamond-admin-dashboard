@@ -10,7 +10,7 @@ WORKDIR /src
 COPY . /src/api
 
 # Install dependencies
-RUN pip install -r requirements.txt
+RUN pip install -r api/requirements.txt
 
 ENV FLASK_ENV development
 ENV FLASK_RUN_PORT 5328
