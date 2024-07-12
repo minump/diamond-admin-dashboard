@@ -1,13 +1,11 @@
 .dockerignore
 Dockerfile
 db.sqlite3
-**/__pycache__
+**/__pycache__/
 *.pyc
 *.pyo
 *.pyd
 .Python
-.env
-**/.env
 **/.env.example
 pip-log.txt
 .tox

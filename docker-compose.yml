@@ -8,12 +8,12 @@ services:
 
   api:
     build:
-      context: ./api
-      dockerfile: Dockerfile
+      context: ./api/
+      dockerfile: api/Dockerfile
     env_file:
       - .env
     volumes:
-      - ./api:/src
+      - ./api:/src/api
     networks:
       - default
     ports:
@@ -21,7 +21,7 @@ services:
   
   client:
     build:
-      context: ./
+      context: .
       dockerfile: Dockerfile
     env_file:
       - .env
@@ -35,15 +35,3 @@ services:
     depends_on:
       - api
   
-  nginx:
-    build:
-      context: ./nginx
-      dockerfile: Dockerfile
-    ports:
-      - 8080:8080
-    restart: unless-stopped
-    depends_on:
-      - api
-      - client
-    networks:
-      - default
