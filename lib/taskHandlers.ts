@@ -1,4 +1,8 @@
+'use server';
+
 import { cookies } from 'next/headers';
+
+const FLASK_URL = process.env.FLASK_URL;
 
 export async function singleNodeTask(data: any) {
   try {
@@ -19,7 +23,7 @@ export async function singleNodeTask(data: any) {
   }
 }
 
-export async function registerContainer(data: any) {
+export async function registerContainer(data: any): Promise<any> {
   try {
     const tokens = cookies().get('tokens');
     const headers: Record<string, string> = {};
@@ -28,16 +32,19 @@ export async function registerContainer(data: any) {
       headers['Content-Type'] = 'application/json';
       headers['Cookie'] = `tokens=${JSON.stringify(tokens)}`;
     }
-    const response = await fetch(`/api/register_container`, {
+    const response = await fetch(`${FLASK_URL}/api/register_container`, {
       method: 'POST',
       headers: headers,
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
+      credentials: 'include'
     });
     if (!response.ok) {
+      console.log('response:', response);
       throw new Error('Network response was not ok');
     }
     const responseData = await response.json();
     console.log(responseData);
+    return responseData;
   } catch (error) {
     console.error('Error in registerContainer:', error);
   }

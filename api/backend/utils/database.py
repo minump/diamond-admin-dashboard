@@ -82,15 +82,10 @@ class Database:
         institution = str(institution) if institution is not None else None
 
         db.execute(
-            """update profile set name = ?, email = ?, institution = ?
-									 where identity_id = ? on conflict(identity_id) do update set
-                                    name = excluded.name, email = excluded.email, institution = excluded.institution""",
-            (name, email, institution, identity_id),
-        )
-
-        db.execute(
-            """insert or replace into profile (identity_id, name, email, institution)
-               values (?, ?, ?, ?)""",
+            """INSERT INTO profile (identity_id, name, email, institution)
+            VALUES (?, ?, ?, ?)
+            ON CONFLICT(identity_id) DO UPDATE SET
+            name = excluded.name, email = excluded.email, institution = excluded.institution""",
             (identity_id, name, email, institution),
         )
         db.commit()

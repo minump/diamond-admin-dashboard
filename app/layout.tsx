@@ -11,6 +11,7 @@ import {
 } from '@/components/icons';
 import { NavItem } from './nav-item';
 import { is_authenticated } from '@/lib/authUtils';
+import { Toaster } from '@/components/ui/toaster';
 
 export const metadata = {
   title: 'Diamond Admin Dashboard',
@@ -101,6 +102,7 @@ export default async function RootLayout({
             </header>
             {children}
           </div>
+          <Toaster />
         </div>
         <Analytics />
       </body>

@@ -53,12 +53,12 @@ def is_authenticated():
 
 
 # Todo:
-# @app.route("/diamond-endpoint-register-container", methods=["POST"])
-# @authenticated
-# def diamond_endpoint_register_container():
-#     # Todo Call diamond sdk register container
-#
-#     # return jsonify(response)
+@app.route("/api/register_container", methods=["POST"])
+@authenticated
+def diamond_endpoint_register_container():
+    # Todo Call diamond sdk register container
+    return jsonify({"message": "Container registered successfully"})
+    # return jsonify(response)
 
 
 @app.route("/logout", methods=["GET"])
