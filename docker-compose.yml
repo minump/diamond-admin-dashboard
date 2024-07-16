@@ -34,4 +34,35 @@ services:
       - 3000:3000
     depends_on:
       - api
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.client.rule=Host(`${HOST}`)"
+      - "traefik.http.routers.client.entrypoints=web"
+
+  traefik:
+    image: traefik:v3.1
+    command:
+      - --loglevel=INFO
+      - --api
+      - --api.insecure=true
+      # Entrypoints
+      - --entrypoints.http.address=:80
+      - --entrypoints.https.address=:443
+      - --entrypoints.web.address=:3000
+      # Enabling docker providers
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+    restart: unless-stopped
+    networks:
+      - default
+    ports:
+      - "${TRAEFIK_HTTP_PORT-8000}:80"
+      - "${TRAEFIK_HTTPS_PORT-8443}:443"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.rule=PathPrefix(`/traefik`)"
+      - "traefik.http.routers.traefik.entrypoints=http,https"
+      - "traefik.http.routers.traefik.middlewares=traefik-ipwhitelist"
+      - "traefik.http.middlewares.traefik-ipwhitelist.ipwhitelist.sourcerange=${TRAEFIK_IPFILTER:-172.16.0.0/12}"
+      - "traefik.http.services.traefik.loadbalancer.server.port=8080"
   
