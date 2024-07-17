@@ -1,23 +1,34 @@
 name: diamond-frontend
 
 networks:
-  default:
-    name: diamond-frontend-network
+  diamond-frontend-network:
+
+  # proxy:
+  #   external: true
+  #   name: proxy
+  # default:
+  #   name: diamond-frontend-network
+  #   driver: bridge
 
 services:
 
   api:
     build:
       context: ./api
-      dockerfile: api/Dockerfile
+      dockerfile: Dockerfile
     env_file:
       - .env
     volumes:
       - ./api:/src/api
     networks:
-      - default
+      - diamond-frontend-network
     ports:
       - 5328:5328
+    labels:
+      - "traefik.http.routers.api.rule=Host(`${HOST}`)"
+      - "traefik.http.routers.api.entrypoints=web"
+      - "traefik.http.routers.api.rule=PathPrefix(`/`)"
+      - "traefik.http.services.api.loadbalancer.server.port=5328"
   
   client:
     build:
@@ -29,20 +40,22 @@ services:
       - ./:/src
       - /src/node_modules/
     networks:
-      - default
+      - diamond-frontend-network
     ports:
       - 3000:3000
     depends_on:
       - api
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.client.rule=Host(`${HOST}`)"
       - "traefik.http.routers.client.entrypoints=web"
+      - "traefik.http.routers.client.rule=Host(`${HOST}`)"
+      - "traefik.http.routers.client.rule=PathPrefix(`/`)"
+      - "traefik.http.services.client.loadbalancer.server.port=3000"
 
   traefik:
     image: traefik:v3.1
     command:
-      - --loglevel=INFO
+      - --log.level=INFO
       - --api
       - --api.insecure=true
       # Entrypoints
@@ -53,16 +66,21 @@ services:
       - --providers.docker=true
       - --providers.docker.exposedbydefault=false
     restart: unless-stopped
-    networks:
-      - default
     ports:
       - "${TRAEFIK_HTTP_PORT-8000}:80"
       - "${TRAEFIK_HTTPS_PORT-8443}:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock  # Mount the Docker daemon socket
+    networks:
+      - diamond-frontend-network
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.traefik.rule=PathPrefix(`/traefik`)"
       - "traefik.http.routers.traefik.entrypoints=http,https"
-      - "traefik.http.routers.traefik.middlewares=traefik-ipwhitelist"
-      - "traefik.http.middlewares.traefik-ipwhitelist.ipwhitelist.sourcerange=${TRAEFIK_IPFILTER:-172.16.0.0/12}"
+      - "traefik.http.routers.traefik.middlewares=traefik-ipallowlist"
+      - "traefik.http.middlewares.traefik-ipallowlist.ipallowlist.sourcerange=${TRAEFIK_IPFILTER:-172.16.0.0/12}"
       - "traefik.http.services.traefik.loadbalancer.server.port=8080"
+      - "traefik.http.routers.traefik.rule=Host(`${HOST}`)"
+      # - "traefik.docker.network=diamond-frontend-network"
+      
   
