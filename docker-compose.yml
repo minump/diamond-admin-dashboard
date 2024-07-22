@@ -63,7 +63,6 @@ services:
       - --entrypoints.https.address=:443
       - --entrypoints.web.address=:3000
       - --entrypoints.websecure.address=:3001
-      - --entrypoints.ping.address=:8081
       # Enabling docker providers
       - --providers.docker=true
       - --providers.docker.exposedbydefault=false
@@ -71,7 +70,6 @@ services:
     ports:
       - "${TRAEFIK_HTTP_PORT-8000}:80"
       - "${TRAEFIK_HTTPS_PORT-8443}:443"
-      - "${TRAEFIK_PING_PORT-8081}:8081"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock  # Mount the Docker daemon socket
     networks:
@@ -82,9 +80,6 @@ services:
       - "traefik.http.routers.traefik.entrypoints=http,https,web,websecure"
       - "traefik.http.routers.traefik.service=api@internal"
       - "traefik.http.routers.traefik.tls=true"
-      - "traefik.http.routers.traefik_ping.rule=Host(`traefik.localhost`) && PathPrefix(`/ping`)"  # Ping
-      - "traefik.http.routers.traefik_ping.entrypoints=ping"
-      - "traefik.http.routers.traefik_ping.service=ping@internal"
       - "traefik.http.routers.traefik.middlewares=traefik-ipallowlist"
       - "traefik.http.middlewares.traefik-ipallowlist.ipallowlist.sourcerange=${TRAEFIK_IPFILTER:-172.16.0.0/12}"
       - "traefik.http.services.traefik.loadbalancer.server.port=8080"
