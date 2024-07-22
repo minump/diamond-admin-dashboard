@@ -4,10 +4,10 @@ RUN apt-get update && \
     apt-get clean
 
 # set working directory
-WORKDIR /src
+WORKDIR /app
 
 # Copy the entire API directory correctly
-COPY . /src/api
+COPY . /app/api
 
 # Install dependencies
 RUN pip install -r api/requirements.txt
@@ -18,4 +18,6 @@ EXPOSE 5328
 
 # run flask server
 #CMD ["python3", "-m", "flask", "--app", "api.backend.index", "--debug", "run", "-p", "5328"]
-CMD ["python3", "-m", "flask", "--app", "api.backend.index", "run", "--host=0.0.0.0", "--port=5328"]
+#CMD ["python3", "-m", "flask", "--app", "api.backend.index", "run", "--host=0.0.0.0", "--port=5328"]
+
+CMD ["gunicorn", "--workers=1", "--threads=100", "--worker-class=gthread", "api.backend.index", "--port=5328"]

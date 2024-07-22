@@ -19,7 +19,7 @@ services:
     env_file:
       - .env
     volumes:
-      - ./api:/src/api
+      - ./api:/app/api
     networks:
       - diamond-frontend-network
     ports:
@@ -37,8 +37,8 @@ services:
     env_file:
       - .env
     volumes:
-      - ./:/src
-      - /src/node_modules/
+      - ./:/app
+      - /node_modules/
     networks:
       - diamond-frontend-network
     ports:
