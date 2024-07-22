@@ -21,12 +21,13 @@ RUN \
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
+# Copy the rest of your app's source code from your host to your image filesystem, excluding /api/
 COPY . .
 RUN rm -rf ./api
-# This will do the trick, use the corresponding env file for each environment.
 
-# 
+# This will do the trick, use the corresponding env file for each environment.
 COPY .env .env.production
+
 RUN pnpm run build
 
 # 3. Production image, copy all the files and run next
@@ -37,8 +38,6 @@ ENV NODE_ENV=production
 
 RUN addgroup -g 1001 -S nodejs
 RUN adduser -S nextjs -u 1001
-
-COPY --from=builder /app/public ./public
 
 # Automatically leverage output traces to reduce image size
 # https://nextjs.org/docs/advanced-features/output-file-tracing
