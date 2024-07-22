@@ -12,7 +12,7 @@ COPY . /app/api
 # Install dependencies
 RUN pip install -r api/requirements.txt
 
-ENV FLASK_ENV development
+ENV FLASK_ENV PRODUCTION
 ENV FLASK_RUN_PORT 5328
 EXPOSE 5328
 

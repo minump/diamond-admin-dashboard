@@ -5,7 +5,7 @@ Dockerfile
 *.pyo
 *.pyd
 .Python
-**/.env
+
 **/.env.example
 pip-log.txt
 .tox
