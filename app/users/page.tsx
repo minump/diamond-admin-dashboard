@@ -1,5 +1,5 @@
-import { getUsers } from '@/lib/db';
-import { UsersTable } from './users-table';
+// import { getUsers } from '@/lib/db';
+// import { UsersTable } from './users-table';
 import { Search } from './search';
 
 export default async function UsersPage({
@@ -9,7 +9,7 @@ export default async function UsersPage({
 }) {
   const search = searchParams.q ?? '';
   const offset = searchParams.offset ?? 0;
-  const { users, newOffset } = await getUsers(search, Number(offset));
+  // const { users, newOffset } = await getUsers(search, Number(offset));
 
   return (
     <main className="flex flex-1 flex-col p-4 md:p-6">
@@ -19,7 +19,7 @@ export default async function UsersPage({
       <div className="w-full mb-4">
         <Search value={searchParams.q} />
       </div>
-      <UsersTable users={users} offset={newOffset} />
+      {/* <UsersTable users={users} offset={newOffset} /> */}
     </main>
   );
 }

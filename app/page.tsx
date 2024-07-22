@@ -1,7 +1,7 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { getUsers } from '@/lib/db';
+// import { getUsers } from '@/lib/db';
 import { fetchSessionData } from '@/lib/utils';
 
 export default function DashboardPage({
