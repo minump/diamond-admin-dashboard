@@ -23,7 +23,8 @@ const nextConfig = {
             : '/api/'
       }
     ];
-  }
+  },
+  output: 'standalone',
 };
 
 module.exports = nextConfig;
