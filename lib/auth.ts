@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+const FLASK_URL = process.env.FLASK_URL || 'http://localhost:5328';
+
 function signIn() {
-  return NextResponse.redirect('http://localhost:5328/login');
+  return NextResponse.redirect(`${FLASK_URL}/login`);
 }
 
 function signOut() {
-  return NextResponse.redirect('http://localhost:5328/logout');
+  return NextResponse.redirect(`${FLASK_URL}//logout`);
 }
 
 function auth(request: NextRequest) {

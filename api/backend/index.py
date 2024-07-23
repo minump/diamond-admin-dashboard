@@ -23,7 +23,7 @@ log = logging.getLogger(__name__)
 @app.route("/", methods=["GET"])
 def home():
     """Home route."""
-    return redirect("http://localhost:3000/sign-in")
+    return redirect(os.environ["NEXT_URL"] + "/sign-in")
 
 
 @app.route("/signup", methods=["GET"])
@@ -123,7 +123,7 @@ def profile():
         # )
         # return render_template("profile.jinja2")
         # Redirect to localhost:3000/profile
-        response = make_response(redirect("http://localhost:3000/"))
+        response = make_response(redirect(os.environ["NEXT_URL"]))
         response.set_cookie("primary_identity", session["primary_identity"])
         response.set_cookie("name", session["name"])
         response.set_cookie("email", session["email"])
