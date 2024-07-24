@@ -1,14 +1,6 @@
-name: diamond-frontend
 
 networks:
   diamond-frontend-network:
-
-  # proxy:
-  #   external: true
-  #   name: proxy
-  # default:
-  #   name: diamond-frontend-network
-  #   driver: bridge
 
 services:
 
@@ -33,7 +25,6 @@ services:
   client:
     build:
       context: .
-      # target: runner
       dockerfile: prod.Dockerfile
     env_file:
       - .env
@@ -88,7 +79,7 @@ services:
       - "traefik.http.routers.traefik.middlewares=traefik-ipallowlist"
       - "traefik.http.middlewares.traefik-ipallowlist.ipallowlist.sourcerange=${TRAEFIK_IPFILTER:-172.16.0.0/12}"
       - "traefik.http.services.traefik.loadbalancer.server.port=8080"
-      - "traefik.http.routers.traefik.rule=Host(`0.0.0.0`)"
+      # - "traefik.http.routers.traefik.rule=Host(`${HOST}`)"
       # - "traefik.docker.network=diamond-frontend-network"
       
   
