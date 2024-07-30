@@ -14,12 +14,9 @@ services:
       - ./api:/app/api
     networks:
       - diamond-frontend-network
-    ports:
-      - 5328:5328
     labels:
-      - "traefik.http.routers.api.rule=Host(`${HOST}`)"
-      - "traefik.http.routers.api.entrypoints=web"
-      - "traefik.http.routers.api.rule=PathPrefix(`/api`)"
+      - "traefik.enable=true"
+      - "traefik.http.routers.api.rule=Host(`${HOST}`) && PathPrefix(`/api`) "
       - "traefik.http.services.api.loadbalancer.server.port=5328"
   
   client:
@@ -34,29 +31,21 @@ services:
     #   - /app/.next/
     networks:
       - diamond-frontend-network
-    ports:
-      - 3000:3000
     depends_on:
       - api
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.client.entrypoints=web"
-      - "traefik.http.routers.client.rule=Host(`${HOST}`)"
-      - "traefik.http.routers.client.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.client.rule=Host(`${HOST}`) && PathPrefix(`/`)"
       - "traefik.http.services.client.loadbalancer.server.port=3000"
 
   traefik:
     image: traefik:v3.1
     command:
-      - --log.level=DEBUG
+      - --log.level=INFO
       - --api
-      - --api.dashboard=true
-      - --api.insecure=true
       # Entrypoints
       - --entrypoints.http.address=:80
       - --entrypoints.https.address=:443
-      - --entrypoints.web.address=:3000
-      - --entrypoints.websecure.address=:3001
       # Enabling docker providers
       - --providers.docker=true
       - --providers.docker.exposedbydefault=false
@@ -65,7 +54,6 @@ services:
     ports:
       - "${TRAEFIK_HTTP_PORT-8000}:80"
       - "${TRAEFIK_HTTPS_PORT-8443}:443"
-      - "8080:8080"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock  # Mount the Docker daemon socket
     networks:
@@ -73,13 +61,12 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.traefik.rule=Host(`traefik.localhost`)"  # Dashboard
-      - "traefik.http.routers.traefik.entrypoints=http,https,web,websecure"
+      - "traefik.http.routers.traefik.entrypoints=http"
       - "traefik.http.routers.traefik.service=api@internal"
-      - "traefik.http.routers.traefik.tls=true"
-      - "traefik.http.routers.traefik.middlewares=traefik-ipallowlist"
-      - "traefik.http.middlewares.traefik-ipallowlist.ipallowlist.sourcerange=${TRAEFIK_IPFILTER:-172.16.0.0/12}"
+      #- "traefik.http.routers.traefik.tls=true"
+      # - "traefik.http.routers.traefik.middlewares=traefik-ipallowlist"
+      # - "traefik.http.middlewares.traefik-ipallowlist.ipallowlist.sourcerange=${TRAEFIK_IPFILTER:-172.16.0.0/12}"
       - "traefik.http.services.traefik.loadbalancer.server.port=8080"
-      # - "traefik.http.routers.traefik.rule=Host(`${HOST}`)"
       # - "traefik.docker.network=diamond-frontend-network"
       
   
