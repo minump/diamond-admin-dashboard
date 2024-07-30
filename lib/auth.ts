@@ -7,7 +7,7 @@ function signIn() {
 }
 
 function signOut() {
-  return NextResponse.redirect(`${FLASK_URL}//logout`);
+  return NextResponse.redirect(`${FLASK_URL}/logout`);
 }
 
 function auth(request: NextRequest) {
