@@ -25,7 +25,7 @@ FRONTEND_URL = os.environ.get("FRONTEND_URL", "http://localhost:3000")
 @app.route("/", methods=["GET"])
 def home():
     """Home route."""
-    return redirect(f"{FRONTEND_URL}/sign-in")
+    return redirect(os.environ["NEXT_URL"] + "/sign-in")
 
 
 @app.route("/signup", methods=["GET"])

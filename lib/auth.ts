@@ -1,4 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { is_authenticated } from './authUtils';
+
+const NEXT_URL = process.env.NEXT_URL || 'http://localhost:3000';
+
+function redirectToSignIn() {
+  return NextResponse.redirect(NEXT_URL + '/sign-in');
+}
 
 const FLASK_URL = process.env.FLASK_URL || 'http://localhost:5328';
 
