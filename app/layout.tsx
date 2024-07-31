@@ -9,9 +9,9 @@ import {
   UsersIcon,
   HomeIcon
 } from '@/components/icons';
-// import { User } from './users/user';
-import DashboardPage from './page';
 import { NavItem } from './nav-item';
+import { is_authenticated } from '@/lib/authUtils';
+import { Toaster } from '@/components/ui/toaster';
 
 export const metadata = {
   title: 'Diamond Admin Dashboard',
@@ -19,11 +19,14 @@ export const metadata = {
     'Diamond admin dashboard configured with Flask server backend, SQLite database, Next.js, Tailwind CSS, TypeScript, and Prettier.'
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children
 }: {
   children: React.ReactNode;
 }) {
+  // const FLASK_URL = process.env.FLASK_URL;
+  const isAuthenticated = await is_authenticated();
+
   return (
     <html lang="en" className="h-full bg-gray-50">
       <body>
@@ -40,24 +43,28 @@ export default function RootLayout({
                 </Link>
               </div>
               <div className="flex-1 overflow-auto py-2">
-                <nav className="grid items-start px-4 text-sm font-medium">
-                  <NavItem href="/">
-                    <HomeIcon className="h-4 w-4" />
-                    Dashboard
-                  </NavItem>
-                  <NavItem href="/job-composer">
-                    <EditIcon className="h-4 w-4" />
-                    Job Composer
-                  </NavItem>
-                  <NavItem href="/users">
-                    <UsersIcon className="h-4 w-4" />
-                    Users
-                  </NavItem>
-                  <NavItem href="/settings">
-                    <SettingsIcon className="h-4 w-4" />
-                    Settings
-                  </NavItem>
-                </nav>
+                {isAuthenticated ? (
+                  <nav className="grid items-start px-4 text-sm font-medium">
+                    <NavItem href="/">
+                      <HomeIcon className="h-4 w-4" />
+                      Dashboard
+                    </NavItem>
+                    <NavItem href="/job-composer">
+                      <EditIcon className="h-4 w-4" />
+                      Job Composer
+                    </NavItem>
+                    <NavItem href="/users">
+                      <UsersIcon className="h-4 w-4" />
+                      Users
+                    </NavItem>
+                    <NavItem href="/settings">
+                      <SettingsIcon className="h-4 w-4" />
+                      Settings
+                    </NavItem>
+                  </nav>
+                ) : (
+                  <></>
+                )}
               </div>
             </div>
           </div>
@@ -70,10 +77,32 @@ export default function RootLayout({
                 <Logo />
                 <span className="">DIAMOND</span>
               </Link>
+              {isAuthenticated ? (
+                <>
+                  <div
+                    className={
+                      'border-2 rounded-xl p-2 hover:bg-blue-800 hover:text-white cursor-pointer'
+                    }
+                  >
+                    <Link href={'logout'}> Logout</Link>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div
+                    className={
+                      'border-2 rounded-xl p-2 hover:bg-blue-800 hover:text-white cursor-pointer'
+                    }
+                  >
+                    <Link href={'login'}> Sign In</Link>
+                  </div>
+                </>
+              )}
               {/* <User /> */}
             </header>
             {children}
           </div>
+          <Toaster />
         </div>
         <Analytics />
       </body>

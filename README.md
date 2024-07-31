@@ -1,57 +1,68 @@
-<div align="center"><strong>Next.js 14 Admin Dashboard Template</strong></div>
-<div align="center">Built with the Next.js App Router</div>
-<br />
-<div align="center">
-<a href="https://next-admin-dash.vercel.app/">Demo</a>
-<span> · </span>
-<a href="https://vercel.com/templates/next.js/admin-dashboard-tailwind-postgres-react-nextjs">Clone & Deploy</a>
-<span>
-</div>
+# Diamond Admin Dashboard
 
 ## Overview
 
-This is a starter template using the following stack:
+Diamond Admin Dashboard is a comprehensive admin interface built with Next.js and Flask, integrating SQLite for database management. It features a modern UI with Tailwind CSS and TypeScript, and is designed for managing jobs, users, and settings within a secure environment.
 
-- Framework - [Next.js 14](https://nextjs.org/)
-- Language - [TypeScript](https://www.typescriptlang.org)
-- Auth - [NextAuth.js](https://next-auth.js.org)
-- Database - [Postgres](https://vercel.com/postgres)
-- Deployment - [Vercel](https://vercel.com/docs/concepts/next.js/overview)
-- Styling - [Tailwind CSS](https://tailwindcss.com)
-- Components - [Shadcn UI](https://ui.shadcn.com/)
-- Analytics - [Vercel Analytics](https://vercel.com/analytics)
-- Formatting - [Prettier](https://prettier.io)
+## Installation Instructions
 
-This template uses the new Next.js App Router. This includes support for enhanced layouts, colocation of components, tests, and styles, component-level data fetching, and more.
+### Prerequisites
 
-## Getting Started
+- Node.js
+- Python 3
+- pnpm (Package manager)
 
-During the deployment, Vercel will prompt you to create a new Postgres database. This will add the necessary environment variables to your project.
+### Setting Up the Project
 
-Inside the Vercel Postgres dashboard, create a table based on the schema defined in this repository.
+1. **Clone the repository:**
 
-```
-CREATE TABLE users (
-  id SERIAL PRIMARY KEY,
-  email VARCHAR(255) NOT NULL,
-  name VARCHAR(255),
-  username VARCHAR(255)
-);
-```
+   ```bash
+   git clone [repository-url]
+   cd [repository-directory]
+   ```
 
-Insert a row for testing:
+2. **Install Node dependencies:**
 
-```
-INSERT INTO users (id, email, name, username) VALUES (1, 'me@site.com', 'Me', 'username');
-```
+   ```bash
+   pnpm install
+   ```
 
-Copy the `.env.example` file to `.env` and update the values.
+3. **Set up Python environment:**
 
-Finally, run the following commands to start the development server:
+   - Create a virtual environment:
+     ```bash
+     python -m venv venv
+     ```
+   - Activate the virtual environment:
+     ```bash
+     # For Windows
+     .\venv\Scripts\activate
+     # For Unix or MacOS
+     source venv/bin/activate
+     ```
+   - Install Python dependencies:
+     ```bash
+     pip install -r requirements.txt
+     ```
 
-```
-pnpm install
-pnpm dev
-```
+4. **Environment Configuration:**
 
-You should now be able to access the application at http://localhost:3000.
+   - Copy the `.env.example` file to `.env` and adjust the configuration to match your local setup for both backend and frontend.
+
+5. **Running the Development Servers:**
+
+   - Start the Flask backend:
+     ```bash
+     pnpm run flask-dev
+     ```
+   - In a new terminal, start the Next.js frontend:
+     ```bash
+     pnpm run next-dev
+     ```
+
+6. **Access the Application:**
+   - Open your web browser and navigate to `http://localhost:3000` to view the dashboard.
+
+## Additional Information
+
+- Ensure all environment variables and configurations are set correctly in the `.env` file for both the backend and frontend services.

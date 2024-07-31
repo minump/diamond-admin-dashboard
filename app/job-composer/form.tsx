@@ -28,6 +28,7 @@ import {
   multiNodeTask
 } from '@/lib/taskHandlers';
 import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/components/ui/use-toast';
 
 const formSchema = z.object({
   taskType: z.enum(['singleNode', 'registerContainer', 'multiNode']),
@@ -43,6 +44,7 @@ const formSchema = z.object({
 });
 
 export function JobComposerForm() {
+  const { toast } = useToast();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -69,6 +71,14 @@ export function JobComposerForm() {
             endpoint: values.endpoint,
             work_path: values.work_path
           });
+          console.log('response after register container:', response);
+          if (response !== null) {
+            console.log('response in form:', response);
+            toast({
+              title: 'Success',
+              description: response.message
+            });
+          }
           break;
         case 'multiNode':
           response = await multiNodeTask({
