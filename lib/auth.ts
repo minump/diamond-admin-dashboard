@@ -7,12 +7,14 @@ function redirectToSignIn() {
   return NextResponse.redirect(NEXT_URL + '/sign-in');
 }
 
+const FLASK_URL = process.env.FLASK_URL || 'http://localhost:5328';
+
 function signIn() {
-  return NextResponse.redirect(`${process.env.FLASK_URL}/login`);
+  return NextResponse.redirect(`${FLASK_URL}/login`);
 }
 
 function signOut() {
-  const response = NextResponse.redirect(`${process.env.FLASK_URL}/logout`);
+  const response = NextResponse.redirect(`${FLASK_URL}/logout`);
   response.cookies.delete('tokens');
   return response;
 }

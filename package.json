@@ -48,5 +48,6 @@
     "singleQuote": true,
     "tabWidth": 2,
     "trailingComma": "none"
-  }
+  },
+  "packageManager": "pnpm@9.1.3"
 }
