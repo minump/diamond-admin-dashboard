@@ -165,14 +165,20 @@ export function JobComposerForm() {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {endpoints.map((endpoint) => (
-                        <SelectItem
-                          key={endpoint.endpoint_uuid}
-                          value={endpoint.endpoint_uuid}
-                        >
-                          {endpoint.endpoint_name}
+                      {endpoints.length > 0 ? (
+                        endpoints.map((endpoint) => (
+                          <SelectItem
+                            key={endpoint.endpoint_uuid}
+                            value={endpoint.endpoint_uuid}
+                          >
+                            {endpoint.endpoint_name}
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <SelectItem value="none" disabled>
+                          No endpoints available
                         </SelectItem>
-                      ))}
+                      )}
                     </SelectContent>
                   </Select>
                 </FormItem>
