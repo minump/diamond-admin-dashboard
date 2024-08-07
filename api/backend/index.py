@@ -19,13 +19,13 @@ logging.basicConfig(
 # create log object with current module name
 log = logging.getLogger(__name__)
 
-HOST = os.environ.get("HOST", "http://localhost:3000")
-
+HOST = os.environ.get("HOST", "http://diamond.localhost")
+NEXT_URL = os.environ.get("NEXT_URL", "http://diamond.localhost:3000")
 
 @app.route("/", methods=["GET"])
 def home():
     """Home route."""
-    return redirect(os.environ["HOST"] + "/sign-in")
+    return redirect(NEXT_URL + "/sign-in")
 
 
 @app.route("/api/signup", methods=["GET"])
