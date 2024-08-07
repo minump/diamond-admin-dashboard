@@ -1,9 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
-import { getUsers } from '@/lib/db';
+import React from 'react';
 import { cookies } from 'next/headers';
 import { is_authenticated } from '@/lib/authUtils';
-import { unescape } from 'querystring';
 
 export default async function DashboardPage({
   searchParams

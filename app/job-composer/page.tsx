@@ -1,6 +1,8 @@
+import { is_authenticated } from '@/lib/authUtils';
 import { JobComposerForm } from './form';
 
 export default async function JobComposerPage() {
+  const isAuthenticated = await is_authenticated();
   return (
     <main className="flex flex-1 flex-col gap-4 m-8 md:gap-8 md:p-6 items-start">
       <div className="flex items-center">

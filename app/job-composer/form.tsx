@@ -29,6 +29,7 @@ import {
 } from '@/lib/taskHandlers';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
+import { useEffect, useState } from 'react';
 
 const formSchema = z.object({
   taskType: z.enum(['singleNode', 'registerContainer', 'multiNode']),
@@ -52,6 +53,24 @@ export function JobComposerForm() {
       jobName: 'registerContainer'
     }
   });
+
+  const [endpoints, setEndpoints] = useState<
+    { endpoint_uuid: string; endpoint_name: string }[]
+  >([]);
+
+  useEffect(() => {
+    async function fetchEndpoints() {
+      try {
+        const response = await fetch('/api/list_active_endpoints');
+        const data = await response.json();
+        setEndpoints(data);
+      } catch (error) {
+        console.error('Error fetching endpoints:', error);
+      }
+    }
+    fetchEndpoints();
+    console.log('Endpoints:', endpoints);
+  }, []);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
@@ -136,7 +155,26 @@ export function JobComposerForm() {
               render={({ field }) => (
                 <FormItem className="w-[60%] md:w-[20%]">
                   <FormLabel>Endpoint</FormLabel>
-                  <Input placeholder="Endpoint URL" {...field} />
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select endpoint" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {endpoints.map((endpoint) => (
+                        <SelectItem
+                          key={endpoint.endpoint_uuid}
+                          value={endpoint.endpoint_uuid}
+                        >
+                          {endpoint.endpoint_name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </FormItem>
               )}
             />

@@ -1,33 +1,44 @@
 import json
-from flask import request
+import logging
 
 import globus_sdk
-from globus_sdk.scopes import AuthScopes
+from flask import request
 from globus_compute_sdk import Client as GlobusComputeClient
 from globus_compute_sdk.sdk.login_manager import AuthorizerLoginManager
 from globus_compute_sdk.sdk.login_manager.manager import ComputeScopeBuilder
+from globus_sdk.scopes import AuthScopes
+
 
 def initialize_compute_login_manager() -> AuthorizerLoginManager:
+    tokens_cookie = request.cookies.get("tokens")
 
-    tokens = json.loads(request.cookies.get("tokens"))
-    tokens_value = json.loads(json.loads(tokens['value'].replace("\\054", ",")).replace("'", "\""))
+    try:
+        # Sanitize the cookie data
+        sanitized_tokens_cookie = tokens_cookie.replace("'", '"').replace("\\054", ",")
+        tokens_value = json.loads(sanitized_tokens_cookie)
+        # tokens_value = json.loads(tokens['value'].replace("\\054", ","))
+    except json.JSONDecodeError as e:
+        logging.error(f"Error decoding JSON from tokens cookie: {e}")
+        raise
 
     openid_token = None
     funcx_service_token = None
 
     for key, value in tokens_value.items():
-        if value.get('resource_server') == 'funcx_service':
-            funcx_service_token = value.get('access_token')
-        if 'openid' in value.get('scope', ''):
-            openid_token = value.get('access_token')
+        if value.get("resource_server") == "funcx_service":
+            funcx_service_token = value.get("access_token")
+        if "openid" in value.get("scope", ""):
+            openid_token = value.get("access_token")
 
     ComputeScopes = ComputeScopeBuilder()
     compute_auth = globus_sdk.AccessTokenAuthorizer(funcx_service_token)
     openid_auth = globus_sdk.AccessTokenAuthorizer(openid_token)
 
     compute_login_manager = AuthorizerLoginManager(
-        authorizers={ComputeScopes.resource_server: compute_auth,
-                    AuthScopes.resource_server: openid_auth}
+        authorizers={
+            ComputeScopes.resource_server: compute_auth,
+            AuthScopes.resource_server: openid_auth,
+        }
     )
     compute_login_manager.ensure_logged_in()
 
