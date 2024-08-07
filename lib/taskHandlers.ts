@@ -2,7 +2,7 @@
 
 import { cookies } from 'next/headers';
 
-const FLASK_URL = process.env.FLASK_URL;
+const HOST = process.env.HOST;
 
 export async function singleNodeTask(data: any) {
   try {
@@ -32,7 +32,7 @@ export async function registerContainer(data: any): Promise<any> {
       headers['Content-Type'] = 'application/json';
       headers['Cookie'] = `tokens=${JSON.stringify(tokens)}`;
     }
-    const response = await fetch(`${FLASK_URL}/api/register_container`, {
+    const response = await fetch(`${HOST}/api/register_container`, {
       method: 'POST',
       headers: headers,
       body: JSON.stringify(data),

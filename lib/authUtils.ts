@@ -1,7 +1,7 @@
 'use server';
 import { cookies } from 'next/headers';
 
-const FLASK_URL = process.env.FLASK_URL || 'http://localhost:5328';
+const HOST = process.env.HOST || 'http://localhost:5328';
 
 export async function is_authenticated() {
   const tokens = cookies().get('tokens');
@@ -12,7 +12,7 @@ export async function is_authenticated() {
     headers['Content-Type'] = 'application/json';
     headers['Cookie'] = `tokens=${JSON.stringify(tokens)}`;
   }
-  const resp = fetch(`${FLASK_URL}/is_authenticated`, {
+  const resp = fetch(`${HOST}/api/is_authenticated`, {
     credentials: 'include', // Ensure cookies are sent with the request if needed
     headers: headers
   });

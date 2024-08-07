@@ -19,29 +19,29 @@ logging.basicConfig(
 # create log object with current module name
 log = logging.getLogger(__name__)
 
-FRONTEND_URL = os.environ.get("FRONTEND_URL", "http://localhost:3000")
+HOST = os.environ.get("HOST", "http://localhost:3000")
 
 
 @app.route("/", methods=["GET"])
 def home():
     """Home route."""
-    return redirect(os.environ["NEXT_URL"] + "/sign-in")
+    return redirect(os.environ["HOST"] + "/sign-in")
 
 
-@app.route("/signup", methods=["GET"])
+@app.route("/api/signup", methods=["GET"])
 def signup():
     """Send the user to Globus Auth with signup=1."""
     return redirect(url_for("authcallback", signup=1))
 
 
-@app.route("/login", methods=["GET"])
+@app.route("/api/login", methods=["GET"])
 def login():
     """Send the user to Globus Auth."""
     return redirect(url_for("authcallback"))
 
 
 @app.route(
-    "/is_authenticated",
+    "/api/is_authenticated",
     methods=["GET"],
 )
 @authenticated
@@ -143,7 +143,7 @@ def diamond_list_active_endpoints():
 #     return jsonify(container_id)
 
 
-@app.route("/logout", methods=["GET"])
+@app.route("/api/logout", methods=["GET"])
 @authenticated
 def logout():
     """
@@ -188,7 +188,7 @@ def logout():
     return response
 
 
-@app.route("/profile", methods=["GET", "POST"])
+@app.route("/api/profile", methods=["GET", "POST"])
 @authenticated
 def profile():
     """User profile information. Assocated with a Globus Auth identity."""
@@ -235,7 +235,7 @@ def profile():
         # )
         # return render_template("profile.jinja2")
         # Redirect to localhost:3000/profile
-        response = make_response(redirect(f"{FRONTEND_URL}"))
+        response = make_response(redirect(f"{HOST}"))
         response.set_cookie("is_authenticated", "true")
         response.set_cookie("primary_username", session["primary_username"])
         response.set_cookie("primary_identity", session["primary_identity"])
@@ -266,7 +266,7 @@ def profile():
         return redirect(redirect_to)
 
 
-@app.route("/authcallback", methods=["GET"])
+@app.route("/api/authcallback", methods=["GET"])
 def authcallback():
     """Handles the interaction with Globus Auth."""
     # If we're coming back from Globus Auth in an error state, the error
@@ -349,7 +349,7 @@ def authcallback():
                 return "Error creating profile", 500
 
 
-@app.route("/loadprofile", methods=["GET"])
+@app.route("/api/loadprofile", methods=["GET"])
 def loadprofile():
     log.info("loadprofile route")
     return redirect(url_for("profile"))
