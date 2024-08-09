@@ -16,7 +16,7 @@ services:
       - diamond-frontend-network
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.api.rule=Host(`${HOST}`) && PathPrefix(`/api`) "
+      - "traefik.http.routers.api.rule=Host(`diamond.localhost`) && PathPrefix(`/api`) "
       - "traefik.http.services.api.loadbalancer.server.port=5328"
 
   client:
@@ -35,7 +35,7 @@ services:
       - api
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.client.rule=Host(`${HOST}`) && PathPrefix(`/`)"
+      - "traefik.http.routers.client.rule=Host(`diamond.localhost`) && PathPrefix(`/`)"
       - "traefik.http.services.client.loadbalancer.server.port=3000"
 
   traefik:
