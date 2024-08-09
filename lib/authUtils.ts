@@ -1,9 +1,9 @@
 'use server';
 import { cookies } from 'next/headers';
 
-const HOST = process.env.HOST || 'http://diamond.localhost';
-const NEXT_URL = process.env.NEXT_URL || 'http://diamond.localhost:3000';
-const FLASK_URL = process.env.FLASK_URL || 'http://diamond.localhost:5328';
+const HOST = process.env.HOST;
+const NEXT_URL = process.env.NEXT_URL;
+const FLASK_URL = process.env.FLASK_URL;
 
 export async function is_authenticated() {
   const tokens = cookies().get('tokens');
@@ -14,6 +14,7 @@ export async function is_authenticated() {
     headers['Content-Type'] = 'application/json';
     headers['Cookie'] = `tokens=${JSON.stringify(tokens)}`;
   }
+  console.log('in authUtils', `${FLASK_URL}/api/is_authenticated`);
   const resp = fetch(`${FLASK_URL}/api/is_authenticated`, {
     credentials: 'include', // Ensure cookies are sent with the request if needed
     headers: headers

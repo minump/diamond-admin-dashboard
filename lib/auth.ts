@@ -1,20 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { is_authenticated } from './authUtils';
 
-const HOST = process.env.HOST || 'http://diamond.localhost:3000';
-const NEXT_URL = process.env.NEXT_URL || 'http://diamond.localhost:3000';
-const FLASK_URL = process.env.FLASK_URL || 'http://diamond.localhost:5328';
+const HOST = process.env.HOST;
 
 function redirectToSignIn() {
-  return NextResponse.redirect(NEXT_URL + '/sign-in');
+  return NextResponse.redirect(HOST + '/sign-in');
 }
 
 function signIn() {
-  return NextResponse.redirect(`${FLASK_URL}/api/login`);
+  return NextResponse.redirect(`${HOST}/api/login`);
 }
 
 function signOut() {
-  const response = NextResponse.redirect(`${FLASK_URL}/api/logout`);
+  const response = NextResponse.redirect(`${HOST}/api/logout`);
   response.cookies.delete('tokens');
   return response;
 }
