@@ -18,7 +18,7 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.api.rule=Host(`${HOST}`) && PathPrefix(`/api`) "
       - "traefik.http.services.api.loadbalancer.server.port=5328"
-  
+
   client:
     build:
       context: .
@@ -52,8 +52,8 @@ services:
       - --providers.docker.watch=true
     restart: unless-stopped
     ports:
-      - "${TRAEFIK_HTTP_PORT-8000}:80"
-      - "${TRAEFIK_HTTPS_PORT-8443}:443"
+      - "${TRAEFIK_HTTP_PORT:-8000}:80"
+      - "${TRAEFIK_HTTPS_PORT:-8443}:443"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock  # Mount the Docker daemon socket
     networks:
