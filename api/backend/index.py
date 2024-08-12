@@ -69,78 +69,35 @@ def diamond_list_active_endpoints():
     return active_endpoints
 
 
-# @app.route("/api/endpoint_status", methods=["POST"])
-# @authenticated
-# def diamond_get_endpoint_status():
-#     """
-#     Parameters:
-#     ----------
-#       endpoint_uuid: str
-#     Returns:
-#     --------
-#       {'details': 
-#         {'total_workers': 0, 
-#          'idle_workers': 0,
-#          'pending_tasks': 0, 
-#          'outstanding_tasks': 0, 
-#          'managers': 0, 
-#          'nodes_per_block': 1, 
-#          'total_cores': 0, 
-#          'prefetch_capacity': 0, 
-#          'rp_processed_timestamp': '1722360392.8201761', 
-#          'cores_per_worker': 1.0, 
-#          'max_workers_per_node': 2, 
-#          'heartbeat_period': 30, 
-#          'active_managers': 0, 
-#          'max_blocks': 1, 
-#          'scheduler_mode': 0, 
-#          'total_mem': 0, 
-#          'worker_mode': 0, 
-#          'min_blocks': 0, 
-#          'mem_per_worker': None, 
-#          'total_core_hrs': 0, 
-#          'new_core_hrs': 0, 
-#          'scaling_enabled': True
-#         }, 
-#         'status': 'online'}
-#     """
-#     globus_compute_client = initialize_globus_compute_client()
-#     endpoint_uuid = request.json.get('endpoint_uuid')
-#     logging.info(f"Getting endpoint status, endpoint_uuid: {endpoint_uuid}")
-#     endpoint_status = globus_compute_client.get_endpoint_status(endpoint_uuid=endpoint_uuid)
-#     logging.info(endpoint_status)
-#     return jsonify(endpoint_status)
-
-
-# @app.route("/api/register_container", methods=["POST"])
-# @authenticated
-# def diamond_endpoint_register_container():
-#     """
-#     Parameters:
-#     ----------
-#       base_image: str
-#         docker_url, e.g. gcyang/openfold:0.1
-#       container_type : str
-#       name : str
-#       description : str
-#     Returns:
-#     --------
-#       container_id: str
-#     """
-#     globus_compute_client = initialize_globus_compute_client()
-#     base_image = request.json.get('base_image')
-#     container_type = request.json.get('container_type')
-#     name = request.json.get('name')
-#     description = request.json.get('description')
-#     logging.info(f"Registering container")
-#     container_id = globus_compute_client.register_container(
-#         base_image=base_image,
-#         container_type=container_type,
-#         name=name,
-#         description=description
-#     )
-#     logging.info(container_id)
-#     return jsonify(container_id)
+@app.route("/api/register_container", methods=["POST"])
+@authenticated
+def diamond_endpoint_register_container():
+    """
+    Parameters:
+    ----------
+      base_image: str
+        docker_url, e.g. gcyang/openfold:0.1
+      container_type : str
+      name : str
+      description : str
+    Returns:
+    --------
+      container_id: str
+    """
+    globus_compute_client = initialize_globus_compute_client()
+    base_image = request.json.get('base_image')
+    container_type = request.json.get('container_type')
+    name = request.json.get('name')
+    description = request.json.get('description')
+    logging.info(f"Registering container")
+    container_id = globus_compute_client.register_container(
+        base_image=base_image,
+        container_type=container_type,
+        name=name,
+        description=description
+    )
+    logging.info(container_id)
+    return jsonify(container_id)
 
 
 @app.route("/logout", methods=["GET"])
