@@ -32,15 +32,15 @@ import { useToast } from '@/components/ui/use-toast';
 import { useEffect, useState } from 'react';
 
 const formSchema = z.object({
-  taskType: z.enum(['singleNode', 'registerContainer', 'multiNode']),
+  taskType: z.enum(['singleNode', 'multiNode']),
   jobName: z.string().min(2, {
     message: 'Job name must be at least 2 characters.'
   }),
   endpoint: z.string().optional(),
   container_id: z.string().optional(),
   task: z.string().optional(),
-  base_image: z.string().optional(),
-  image_file_name: z.string().optional(),
+  // base_image: z.string().optional(),
+  // image_file_name: z.string().optional(),
   work_path: z.string().optional()
 });
 
@@ -83,22 +83,6 @@ export function JobComposerForm() {
             task: values.task
           });
           break;
-        case 'registerContainer':
-          response = await registerContainer({
-            base_image: values.base_image,
-            image_file_name: values.image_file_name,
-            endpoint: values.endpoint,
-            work_path: values.work_path
-          });
-          console.log('response after register container:', response);
-          if (response !== null) {
-            console.log('response in form:', response);
-            toast({
-              title: 'Success',
-              description: response.message
-            });
-          }
-          break;
         case 'multiNode':
           response = await multiNodeTask({
             endpoint: values.endpoint,
@@ -133,9 +117,6 @@ export function JobComposerForm() {
                 </FormControl>
                 <SelectContent>
                   <SelectItem value="singleNode">Single Node Task</SelectItem>
-                  <SelectItem value="registerContainer">
-                    Register Container Task
-                  </SelectItem>
                   <SelectItem value="multiNode">Multi Node Task</SelectItem>
                 </SelectContent>
               </Select>
@@ -201,51 +182,6 @@ export function JobComposerForm() {
                 <FormItem className="w-[80%] md:w-[50%]">
                   <FormLabel>Task</FormLabel>
                   <Textarea placeholder="Task details" {...field} />
-                </FormItem>
-              )}
-            />
-          </>
-        )}
-
-        {form.watch('taskType') === 'registerContainer' && (
-          <>
-            <FormField
-              control={form.control}
-              name="endpoint"
-              render={({ field }) => (
-                <FormItem className="w-[60%] md:w-[20%]">
-                  <FormLabel>Endpoint ID</FormLabel>
-                  <Input placeholder="Globus Endpoint ID" {...field} />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="base_image"
-              render={({ field }) => (
-                <FormItem className="w-[60%] md:w-[20%]">
-                  <FormLabel>Base Image</FormLabel>
-                  <Input placeholder="Base Image URL" {...field} />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="image_file_name"
-              render={({ field }) => (
-                <FormItem className="w-[60%] md:w-[20%]">
-                  <FormLabel>Image File Name</FormLabel>
-                  <Input placeholder="Image File Name" {...field} />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="work_path"
-              render={({ field }) => (
-                <FormItem className="w-[60%] md:w-[20%]">
-                  <FormLabel>Work Path</FormLabel>
-                  <Input placeholder="Work Path" {...field} />
                 </FormItem>
               )}
             />

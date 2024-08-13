@@ -9,7 +9,10 @@ export async function middleware(request: NextRequest) {
     console.log('Redirecting to Sign in...');
     return NextResponse.next();
   }
-  console.log('authenticating... from middleware.ts with ');
+  console.log(
+    'authenticating... from middleware.ts with ',
+    request.nextUrl.pathname
+  );
   return await auth(request);
 }
 

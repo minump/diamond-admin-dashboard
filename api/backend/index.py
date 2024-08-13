@@ -60,11 +60,12 @@ def diamond_list_active_endpoints():
     for endpoint in endpoints:
         endpoint_uuid = endpoint["uuid"]
         endpoint_status = globus_compute_client.get_endpoint_status(
-            endpoint_uuid=endpoint_uuid)['status']
+            endpoint_uuid=endpoint_uuid
+        )["status"]
         if endpoint_status == "online":
-            active_endpoints.append({
-                "endpoint_name": endpoint["name"],
-                "endpoint_uuid": endpoint_uuid})
+            active_endpoints.append(
+                {"endpoint_name": endpoint["name"], "endpoint_uuid": endpoint_uuid}
+            )
     logging.info(active_endpoints)
     return active_endpoints
 
@@ -85,16 +86,16 @@ def diamond_endpoint_register_container():
       container_id: str
     """
     globus_compute_client = initialize_globus_compute_client()
-    base_image = request.json.get('base_image')
-    container_type = request.json.get('container_type')
-    name = request.json.get('name')
-    description = request.json.get('description')
+    base_image = request.json.get("base_image")
+    container_type = request.json.get("container_type")
+    name = request.json.get("name")
+    description = request.json.get("description")
     logging.info(f"Registering container")
     container_id = globus_compute_client.register_container(
         base_image=base_image,
         container_type=container_type,
         name=name,
-        description=description
+        description=description,
     )
     logging.info(container_id)
     return jsonify(container_id)
@@ -312,20 +313,20 @@ def loadprofile():
     return redirect(url_for("profile"))
 
 
-@app.route("/api/register_container", methods=["POST"])
-def registerContainer():
-    request_data = request.get_json()
-    base_image = request_data["base_image"]
-    image_file_name = request_data["image_file_name"]
-    endpoint = request_data["endpoint"]
-    work_path = request_data["work_path"]
-    register_container(
-        endpoint_id=endpoint,
-        work_path=work_path,
-        base_image=base_image,
-        image_file_name=image_file_name,
-    )
-    return jsonify({"message": "Container registered successfully"})
+# @app.route("/api/register_container", methods=["POST"])
+# def registerContainer():
+#     request_data = request.get_json()
+#     base_image = request_data["base_image"]
+#     image_file_name = request_data["image_file_name"]
+#     endpoint = request_data["endpoint"]
+#     work_path = request_data["work_path"]
+#     register_container(
+#         endpoint_id=endpoint,
+#         work_path=work_path,
+#         base_image=base_image,
+#         image_file_name=image_file_name,
+#     )
+#     return jsonify({"message": "Container registered successfully"})
 
 
 if __name__ == "__main__":

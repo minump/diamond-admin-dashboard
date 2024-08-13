@@ -55,7 +55,7 @@ def authenticated(fn):
             return jsonify({"is_authenticated": False}), 401
         try:
             tokens = json.loads(tokens)["value"]
-            log.debug(f"Tokens: {tokens}")
+            log.debug(f"Tokens in is_authenticated: {tokens} for route: {request.path}")
             if not tokens:
                 log.info("No tokens available")
                 return jsonify({"is_authenticated": False}), 401

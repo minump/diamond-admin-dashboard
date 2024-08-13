@@ -40,7 +40,7 @@ async function auth(request: NextRequest) {
 
   // P3: Check if the user is authenticated
   const isAuthenticated = await is_authenticated();
-  console.debug('session in frontend: ', is_authenticated);
+  console.debug('session in frontend: ', isAuthenticated);
   console.debug('request url: ', request.nextUrl.pathname);
 
   // P4: Redirect to profile if authenticated and URL starts with '/profile'

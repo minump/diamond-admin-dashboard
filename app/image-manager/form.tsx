@@ -32,26 +32,20 @@ import { useToast } from '@/components/ui/use-toast';
 import { useEffect, useState } from 'react';
 
 const formSchema = z.object({
-  taskType: z.enum(['singleNode', 'registerContainer', 'multiNode']),
-  jobName: z.string().min(2, {
+  endpoint: z.string().optional(),
+  container_type: z.string().optional(),
+  name: z.string().min(2, {
     message: 'Job name must be at least 2 characters.'
   }),
-  endpoint: z.string().optional(),
-  container_id: z.string().optional(),
-  task: z.string().optional(),
-  base_image: z.string().optional(),
-  image_file_name: z.string().optional(),
-  work_path: z.string().optional()
+  description: z.string().optional(),
+  base_image: z.string().optional()
 });
 
 export function ImageManagerForm() {
   const { toast } = useToast();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      taskType: 'singleNode',
-      jobName: 'registerContainer'
-    }
+    defaultValues: {}
   });
 
   const [endpoints, setEndpoints] = useState<
@@ -74,41 +68,19 @@ export function ImageManagerForm() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      let response;
-      switch (values.taskType) {
-        case 'singleNode':
-          response = await singleNodeTask({
-            endpoint: values.endpoint,
-            container_id: values.container_id,
-            task: values.task
-          });
-          break;
-        case 'registerContainer':
-          response = await registerContainer({
-            base_image: values.base_image,
-            image_file_name: values.image_file_name,
-            endpoint: values.endpoint,
-            work_path: values.work_path
-          });
-          console.log('response after register container:', response);
-          if (response !== null) {
-            console.log('response in form:', response);
-            toast({
-              title: 'Success',
-              description: response.message
-            });
-          }
-          break;
-        case 'multiNode':
-          response = await multiNodeTask({
-            endpoint: values.endpoint,
-            container_id: values.container_id,
-            task: values.task
-          });
-          break;
-        default:
-          console.error('Invalid task type');
-          return;
+      const response = await registerContainer({
+        base_image: values.base_image ?? '',
+        container_type: values.container_type ?? '',
+        name: values.name ?? '',
+        description: values.description ?? ''
+      });
+      console.log('response after register container:', response);
+      if (response !== null) {
+        console.log('response in form:', response);
+        toast({
+          title: 'Success',
+          description: response.message
+        });
       }
       console.log('Task triggered successfully:', response);
     } catch (error) {
@@ -153,21 +125,41 @@ export function ImageManagerForm() {
         />
         <FormField
           control={form.control}
-          name="container_id"
+          name="base_image"
           render={({ field }) => (
             <FormItem className="w-[60%] md:w-[20%]">
-              <FormLabel>Container ID</FormLabel>
-              <Input placeholder="Container ID" {...field} />
+              <FormLabel>Base Image</FormLabel>
+              <Input placeholder="Base Image" {...field} />
             </FormItem>
           )}
         />
         <FormField
           control={form.control}
-          name="task"
+          name="container_type"
+          render={({ field }) => (
+            <FormItem className="w-[60%] md:w-[20%]">
+              <FormLabel>Container Type</FormLabel>
+              <Input placeholder="Container Type" {...field} />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem className="w-[60%] md:w-[20%]">
+              <FormLabel>Name</FormLabel>
+              <Input placeholder="Name" {...field} />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="description"
           render={({ field }) => (
             <FormItem className="w-[80%] md:w-[50%]">
-              <FormLabel>Task</FormLabel>
-              <Textarea placeholder="Task details" {...field} />
+              <FormLabel>Description</FormLabel>
+              <Textarea placeholder="Description" {...field} />
             </FormItem>
           )}
         />
