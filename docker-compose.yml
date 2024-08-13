@@ -1,9 +1,7 @@
-
 networks:
   diamond-frontend-network:
 
 services:
-
   api:
     build:
       context: ./api
@@ -15,9 +13,10 @@ services:
     networks:
       - diamond-frontend-network
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.api.rule=Host(`diamond.localhost`) && PathPrefix(`/api`) "
-      - "traefik.http.services.api.loadbalancer.server.port=5328"
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.api.rule=Host(`diamond.ncsa.illinois.edu`) && PathPrefix(`/api`)'
+      - 'traefik.http.routers.api.entrypoints=websecure'
+      - 'traefik.http.services.api.loadbalancer.server.port=5328'
 
   client:
     build:
@@ -25,48 +24,41 @@ services:
       dockerfile: prod.Dockerfile
     env_file:
       - .env
-    # volumes:
-    #   - ./:/app
-    #   - /app/node_modules/
-    #   - /app/.next/
     networks:
       - diamond-frontend-network
     depends_on:
       - api
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.client.rule=Host(`diamond.localhost`) && PathPrefix(`/`)"
-      - "traefik.http.services.client.loadbalancer.server.port=3000"
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.client.rule=Host(`diamond.ncsa.illinois.edu`) && PathPrefix(`/`)'
+      - 'traefik.http.routers.client.entrypoints=websecure'
+      - 'traefik.http.services.client.loadbalancer.server.port=3000'
 
   traefik:
     image: traefik:v3.1
     command:
-      - --log.level=INFO
+      - --log.level=DEBUG
       - --api
-      # Entrypoints
-      - --entrypoints.http.address=:80
-      - --entrypoints.https.address=:443
-      # Enabling docker providers
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
       - --providers.docker=true
       - --providers.docker.exposedbydefault=false
       - --providers.docker.watch=true
-    restart: unless-stopped
+      - --providers.file.directory=/config
+      - --providers.file.watch=true
     ports:
-      - "${TRAEFIK_HTTP_PORT:-8000}:80"
-      - "${TRAEFIK_HTTPS_PORT:-8443}:443"
+      - '${TRAEFIK_HTTP_PORT:-8000}:80'
+      - '${TRAEFIK_HTTPS_PORT:-8443}:443'
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock  # Mount the Docker daemon socket
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./certs/:/certs
+      - ./traefik.yml:/config/traefik.yml
     networks:
       - diamond-frontend-network
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.traefik.rule=Host(`traefik.localhost`)"  # Dashboard
-      - "traefik.http.routers.traefik.entrypoints=http"
-      - "traefik.http.routers.traefik.service=api@internal"
-      #- "traefik.http.routers.traefik.tls=true"
-      # - "traefik.http.routers.traefik.middlewares=traefik-ipallowlist"
-      # - "traefik.http.middlewares.traefik-ipallowlist.ipallowlist.sourcerange=${TRAEFIK_IPFILTER:-172.16.0.0/12}"
-      - "traefik.http.services.traefik.loadbalancer.server.port=8080"
-      # - "traefik.docker.network=diamond-frontend-network"
-      
-  
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.traefik.rule=Host(`traefik.ncsa.illinois.edu`)'
+      - 'traefik.http.routers.traefik.entrypoints=websecure'
+      - 'traefik.http.routers.traefik.service=api@internal'
+      - 'traefik.http.routers.traefik.tls=true'
+      - 'traefik.http.routers.traefik.tls.domains[0].main=diamond.ncsa.illinois.edu'
