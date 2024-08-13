@@ -1,0 +1,11 @@
+#traefik-dynamic.yml
+tls:
+  certificates:
+    - certFile: /certs/diamond.ncsa.illinois.edu.crt
+      keyFile: /certs/diamond.ncsa.illinois.edu.key
+  stores:
+    default:
+      defaultCertificate:
+        certFile: /certs/diamond.ncsa.illinois.edu.crt
+        keyFile: /certs/diamond.ncsa.illinois.edu.key
+
