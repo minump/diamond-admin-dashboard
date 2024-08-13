@@ -34,6 +34,7 @@ yarn-error.log*
 !nginx/nginx.conf
 
 # traefik
+certs/acme.json
 **.crt
 **.key
 
