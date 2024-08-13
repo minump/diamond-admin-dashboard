@@ -12,6 +12,7 @@ import {
 import { NavItem } from './nav-item';
 import { is_authenticated } from '@/lib/authUtils';
 import { Toaster } from '@/components/ui/toaster';
+import { DashboardIcon, GlobeIcon } from '@radix-ui/react-icons';
 
 export const metadata = {
   title: 'Diamond Admin Dashboard',
@@ -46,19 +47,23 @@ export default async function RootLayout({
                 {isAuthenticated ? (
                   <nav className="grid items-start px-4 text-sm font-medium">
                     <NavItem href="/">
-                      <HomeIcon className="h-4 w-4" />
+                      <DashboardIcon className="h-6 w-6" />
                       Dashboard
                     </NavItem>
+                    <NavItem href="/image-manager">
+                      <GlobeIcon className="h-6 w-6" />
+                      Image Manager
+                    </NavItem>
                     <NavItem href="/job-composer">
-                      <EditIcon className="h-4 w-4" />
+                      <EditIcon className="h-6 w-6" />
                       Job Composer
                     </NavItem>
                     <NavItem href="/users">
-                      <UsersIcon className="h-4 w-4" />
+                      <UsersIcon className="h-6 w-6" />
                       Users
                     </NavItem>
                     <NavItem href="/settings">
-                      <SettingsIcon className="h-4 w-4" />
+                      <SettingsIcon className="h-6 w-6" />
                       Settings
                     </NavItem>
                   </nav>

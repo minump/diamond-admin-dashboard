@@ -1,8 +1,4 @@
-'use server';
-
-import { cookies } from 'next/headers';
-
-const HOST = process.env.HOST;
+import { toast } from '@/components/ui/use-toast';
 
 export async function singleNodeTask(data: any) {
   try {
@@ -23,18 +19,18 @@ export async function singleNodeTask(data: any) {
   }
 }
 
-export async function registerContainer(data: any): Promise<any> {
+export async function registerContainer(data: {
+  base_image: string;
+  container_type: string;
+  name: string;
+  description: string;
+}): Promise<any> {
   try {
-    const tokens = cookies().get('tokens');
-    const headers: Record<string, string> = {};
-    if (tokens) {
-      // headers['Authorization'] = `Bearer ${tokens.value}`;
-      headers['Content-Type'] = 'application/json';
-      headers['Cookie'] = `tokens=${JSON.stringify(tokens)}`;
-    }
-    const response = await fetch(`${HOST}/api/register_container`, {
+    const response = await fetch('/api/register_container', {
       method: 'POST',
-      headers: headers,
+      headers: {
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify(data),
       credentials: 'include'
     });
@@ -43,7 +39,11 @@ export async function registerContainer(data: any): Promise<any> {
       throw new Error('Network response was not ok');
     }
     const responseData = await response.json();
-    console.log(responseData);
+    console.log('register container response: ', responseData);
+    toast({
+      title: 'Success',
+      description: responseData.message
+    });
     return responseData;
   } catch (error) {
     console.error('Error in registerContainer:', error);
