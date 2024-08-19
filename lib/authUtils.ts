@@ -1,5 +1,6 @@
 'use server';
 import { cookies } from 'next/headers';
+import { NextResponse } from 'next/server';
 
 const HOST = process.env.HOST;
 const NEXT_URL = process.env.NEXT_URL;
@@ -32,4 +33,10 @@ export async function is_authenticated() {
     sessionData = await response.json();
   }
   return sessionData.is_authenticated;
+}
+
+export async function signOut() {
+  const response = NextResponse.redirect(`${HOST}/api/logout`);
+  response.cookies.delete('tokens');
+  return response;
 }

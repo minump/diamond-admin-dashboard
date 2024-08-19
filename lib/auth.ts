@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { is_authenticated } from './authUtils';
+import { is_authenticated, signOut } from './authUtils';
 
 const HOST = process.env.HOST;
 
@@ -9,12 +9,6 @@ function redirectToSignIn() {
 
 function signIn() {
   return NextResponse.redirect(`${HOST}/api/login`);
-}
-
-function signOut() {
-  const response = NextResponse.redirect(`${HOST}/api/logout`);
-  response.cookies.delete('tokens');
-  return response;
 }
 
 async function auth(request: NextRequest) {

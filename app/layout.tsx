@@ -10,7 +10,7 @@ import {
   HomeIcon
 } from '@/components/icons';
 import { NavItem } from './nav-item';
-import { is_authenticated } from '@/lib/authUtils';
+import { is_authenticated, signOut } from '@/lib/authUtils';
 import { Toaster } from '@/components/ui/toaster';
 import { DashboardIcon, GlobeIcon } from '@radix-ui/react-icons';
 
@@ -89,7 +89,14 @@ export default async function RootLayout({
                       'border-2 rounded-xl p-2 hover:bg-blue-800 hover:text-white cursor-pointer'
                     }
                   >
-                    <Link href={'logout'}> Logout</Link>
+                    <button
+                      onClick={async () => {
+                        await signOut(); // Use the imported signOut function
+                      }}
+                      className="border-2 rounded-xl p-2 hover:bg-blue-800 hover:text-white cursor-pointer"
+                    >
+                      Logout
+                    </button>
                   </div>
                 </>
               ) : (
