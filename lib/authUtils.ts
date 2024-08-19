@@ -36,7 +36,7 @@ export async function is_authenticated() {
 }
 
 export async function signOut() {
-  const response = NextResponse.redirect(`${HOST}/api/logout`);
+  const response = NextResponse.redirect(`${FLASK_URL}/api/logout`);
   response.cookies.delete('tokens');
   return response;
 }

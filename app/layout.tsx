@@ -13,6 +13,7 @@ import { NavItem } from './nav-item';
 import { is_authenticated, signOut } from '@/lib/authUtils';
 import { Toaster } from '@/components/ui/toaster';
 import { DashboardIcon, GlobeIcon } from '@radix-ui/react-icons';
+import LogoutButton from './logout';
 
 export const metadata = {
   title: 'Diamond Admin Dashboard',
@@ -84,19 +85,8 @@ export default async function RootLayout({
               </Link>
               {isAuthenticated ? (
                 <>
-                  <div
-                    className={
-                      'border-2 rounded-xl p-2 hover:bg-blue-800 hover:text-white cursor-pointer'
-                    }
-                  >
-                    <button
-                      onClick={async () => {
-                        await signOut(); // Use the imported signOut function
-                      }}
-                      className="border-2 rounded-xl p-2 hover:bg-blue-800 hover:text-white cursor-pointer"
-                    >
-                      Logout
-                    </button>
+                  <div>
+                    <LogoutButton />
                   </div>
                 </>
               ) : (
