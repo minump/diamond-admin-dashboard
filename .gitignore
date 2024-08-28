@@ -16,6 +16,15 @@
 # production
 /build
 
+# certificates
+/certs
+
+# backend database
+/api/backend/data
+
+# letsencrypt
+/letsencrypt
+
 # misc
 .DS_Store
 *.pem
