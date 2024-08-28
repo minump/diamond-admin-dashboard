@@ -12,18 +12,6 @@ export function LogoutButton() {
       size={'default'}
       onClick={async () => {
         setIsLoading(true);
-        // const response = await fetch('/logout', {
-        // 	method: 'POST',
-        // 	headers: {
-        // 		'Content-Type': 'application/json',
-        // 	},
-        // });
-        // if (response.ok) {
-        // 	console.log('Logout successful, response:', response);
-        // 	window.location.href = '/';
-        // } else {
-        // 	console.error('Logout failed');
-        // }
         window.location.href = '/logout';
       }}
     >
