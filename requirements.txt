@@ -3,3 +3,4 @@ flask
 diamond-hpc
 python-dotenv
 flask-cors
+bashlex
