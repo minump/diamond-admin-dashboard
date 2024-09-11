@@ -38,13 +38,6 @@ services:
 
   traefik:
     image: traefik:v3.1
-    entrypoint: >
-      /bin/sh -c "
-      mkdir -p /certs &&
-      touch /certs/acme.json &&
-      chmod 600 /certs/acme.json &&
-      /entrypoint.sh traefik
-      "
     command:
       - --log.level=DEBUG
       - --api
@@ -70,6 +63,7 @@ services:
       - "${TRAEFIK_HTTPS_PORT:-8443}:443"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock  # Mount the Docker daemon socket
+      - ./certs:/certs # Mount the certificates directory for acme.json file
     networks:
       - diamond-frontend-network
     labels:
