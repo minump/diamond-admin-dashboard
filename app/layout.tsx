@@ -2,21 +2,33 @@ import './globals.css';
 
 import Link from 'next/link';
 import { Analytics } from '@vercel/analytics/react';
-import { Logo, SettingsIcon, UsersIcon, VercelLogo } from '@/components/icons';
-import { User } from './user';
+import {
+  Logo,
+  SettingsIcon,
+  EditIcon,
+  UsersIcon,
+  HomeIcon
+} from '@/components/icons';
 import { NavItem } from './nav-item';
+import { is_authenticated, signOut } from '@/lib/authUtils';
+import { Toaster } from '@/components/ui/toaster';
+import { DashboardIcon, GlobeIcon } from '@radix-ui/react-icons';
+import LogoutButton from './logout';
 
 export const metadata = {
-  title: 'Next.js App Router + NextAuth + Tailwind CSS',
+  title: 'Diamond Admin Dashboard',
   description:
-    'A user admin dashboard configured with Next.js, Postgres, NextAuth, Tailwind CSS, TypeScript, and Prettier.'
+    'Diamond admin dashboard configured with Flask server backend, SQLite database, Next.js, Tailwind CSS, TypeScript, and Prettier.'
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children
 }: {
   children: React.ReactNode;
 }) {
+  // const FLASK_URL = process.env.FLASK_URL;
+  const isAuthenticated = await is_authenticated();
+
   return (
     <html lang="en" className="h-full bg-gray-50">
       <body>
@@ -29,24 +41,36 @@ export default function RootLayout({
                   href="/"
                 >
                   <Logo />
-                  <span className="">ACME</span>
+                  <span className="">DIAMOND</span>
                 </Link>
               </div>
               <div className="flex-1 overflow-auto py-2">
-                <nav className="grid items-start px-4 text-sm font-medium">
-                  <NavItem href="/">
-                    <UsersIcon className="h-4 w-4" />
-                    Users
-                  </NavItem>
-                  <NavItem href="/settings">
-                    <SettingsIcon className="h-4 w-4" />
-                    Settings
-                  </NavItem>
-                  <NavItem href="https://vercel.com/templates/next.js/admin-dashboard-tailwind-postgres-react-nextjs">
-                    <VercelLogo className="h-4 w-4" />
-                    Deploy
-                  </NavItem>
-                </nav>
+                {isAuthenticated ? (
+                  <nav className="grid items-start px-4 text-sm font-medium">
+                    <NavItem href="/">
+                      <DashboardIcon className="h-6 w-6" />
+                      Dashboard
+                    </NavItem>
+                    <NavItem href="/image-manager">
+                      <GlobeIcon className="h-6 w-6" />
+                      Image Manager
+                    </NavItem>
+                    <NavItem href="/job-composer">
+                      <EditIcon className="h-6 w-6" />
+                      Job Composer
+                    </NavItem>
+                    <NavItem href="/users">
+                      <UsersIcon className="h-6 w-6" />
+                      Users
+                    </NavItem>
+                    <NavItem href="/settings">
+                      <SettingsIcon className="h-6 w-6" />
+                      Settings
+                    </NavItem>
+                  </nav>
+                ) : (
+                  <></>
+                )}
               </div>
             </div>
           </div>
@@ -57,12 +81,30 @@ export default function RootLayout({
                 href="/"
               >
                 <Logo />
-                <span className="">ACME</span>
+                <span className="">DIAMOND</span>
               </Link>
-              <User />
+              {isAuthenticated ? (
+                <>
+                  <div>
+                    <LogoutButton />
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div
+                    className={
+                      'border-2 rounded-xl p-2 hover:bg-blue-800 hover:text-white cursor-pointer'
+                    }
+                  >
+                    <Link href={'login'}> Sign In</Link>
+                  </div>
+                </>
+              )}
+              {/* <User /> */}
             </header>
             {children}
           </div>
+          <Toaster />
         </div>
         <Analytics />
       </body>

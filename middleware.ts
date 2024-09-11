@@ -1,6 +1,21 @@
-export { auth as default } from '@/lib/auth';
+import { NextRequest, NextResponse } from 'next/server';
+import { auth } from './lib/auth';
 
-// Optionally, don't invoke Middleware on some paths
+export async function middleware(request: NextRequest) {
+  if (
+    request.nextUrl.pathname.endsWith('/sign-in')
+    //   request.nextUrl.pathname.endsWith('/logout')
+  ) {
+    console.log('Redirecting to Sign in...');
+    return NextResponse.next();
+  }
+  console.log(
+    'authenticating... from middleware.ts with ',
+    request.nextUrl.pathname
+  );
+  return await auth(request);
+}
+
 export const config = {
   matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)']
 };
