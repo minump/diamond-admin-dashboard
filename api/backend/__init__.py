@@ -25,12 +25,14 @@ load_dotenv(override=True)
 # logging.info('env: ',dotenv.dotenv_values().keys())
 # logging.info("Loading configuration from .env file", os.environ['USER_SCOPES'])
 
+HOST = os.environ.get("HOST")
+
 app = Flask(__name__)
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
 CORS(
     app,
     supports_credentials=True,
-    resources={r"/*": {"origins": "http://localhost:3000"}},
+    resources={r"/*": {"origins": HOST}},
 )
 config = dotenv_values()
 app.config.from_mapping(config)

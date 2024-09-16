@@ -10,11 +10,13 @@ import {
   HomeIcon
 } from '@/components/icons';
 import { NavItem } from './nav-item';
-import { is_authenticated } from '@/lib/authUtils';
+import { is_authenticated, signOut } from '@/lib/authUtils';
 import { Toaster } from '@/components/ui/toaster';
 import { DashboardIcon, GlobeIcon } from '@radix-ui/react-icons';
+
 import { LogoutButton } from '@/components/logout-button';
 import { LoginButton } from '@/components/login-button';
+
 
 export const metadata = {
   title: 'Diamond Admin Dashboard',
@@ -84,7 +86,9 @@ export default async function RootLayout({
                 <Logo />
                 <span className="">DIAMOND</span>
               </Link>
+
               {isAuthenticated ? <LogoutButton /> : <LoginButton />}
+
             </header>
             {children}
           </div>

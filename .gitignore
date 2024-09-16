@@ -42,6 +42,11 @@ yarn-error.log*
 !nginx/dev.conf
 !nginx/nginx.conf
 
+# traefik
+certs/**
+**.crt
+**.key
+
 # vercel
 .vercel
 

@@ -1,22 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { is_authenticated } from './authUtils';
+import { is_authenticated, signOut } from './authUtils';
 
-const NEXT_URL = process.env.NEXT_URL || 'http://localhost:3000';
+const HOST = process.env.HOST;
 
 function redirectToSignIn() {
-  return NextResponse.redirect(NEXT_URL + '/sign-in');
+  return NextResponse.redirect(HOST + '/sign-in');
 }
-
-const FLASK_URL = process.env.FLASK_URL || 'http://localhost:5328';
 
 function signIn() {
-  return NextResponse.redirect(`${FLASK_URL}/login`);
-}
-
-function signOut() {
-  const response = NextResponse.redirect(`${FLASK_URL}/logout`);
-  response.cookies.delete('tokens');
-  return response;
+  return NextResponse.redirect(`${HOST}/api/login`);
 }
 
 async function auth(request: NextRequest) {

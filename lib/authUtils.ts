@@ -1,7 +1,10 @@
 'use server';
 import { cookies } from 'next/headers';
+import { NextResponse } from 'next/server';
 
-const FLASK_URL = process.env.FLASK_URL || 'http://localhost:5328';
+const HOST = process.env.HOST;
+const NEXT_URL = process.env.NEXT_URL;
+const FLASK_URL = process.env.FLASK_URL;
 
 export async function is_authenticated() {
   const tokens = cookies().get('tokens');
@@ -12,7 +15,8 @@ export async function is_authenticated() {
     headers['Content-Type'] = 'application/json';
     headers['Cookie'] = `tokens=${JSON.stringify(tokens)}`;
   }
-  const resp = fetch(`${FLASK_URL}/is_authenticated`, {
+  console.log('in authUtils', `${FLASK_URL}/api/is_authenticated`);
+  const resp = fetch(`${FLASK_URL}/api/is_authenticated`, {
     credentials: 'include', // Ensure cookies are sent with the request if needed
     headers: headers
   });
@@ -29,4 +33,10 @@ export async function is_authenticated() {
     sessionData = await response.json();
   }
   return sessionData.is_authenticated;
+}
+
+export async function signOut() {
+  const response = NextResponse.redirect(`${FLASK_URL}/api/logout`);
+  response.cookies.delete('tokens');
+  return response;
 }
