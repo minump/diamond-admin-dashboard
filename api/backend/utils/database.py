@@ -36,13 +36,24 @@ class Database:
         db = self.get_db()
         db.execute(
             """
-						CREATE TABLE IF NOT EXISTS profile (
-								identity_id VARCHAR(255) PRIMARY KEY,
-								name VARCHAR(255),
-								email VARCHAR(255),
-								institution TEXT
-						)
-				"""
+            CREATE TABLE IF NOT EXISTS profile (
+                    identity_id VARCHAR(255) PRIMARY KEY,
+                    name VARCHAR(255),
+                    email VARCHAR(255),
+                    institution TEXT
+			)
+			"""
+        )
+        db.execute(
+            """
+            CREATE TABLE IF NOT EXISTS task (
+                task_id TEXT PRIMARY KEY,
+                identity_id VARCHAR(255),
+                task_status TEXT,
+                task_create_time TIMESTAMP,
+                FOREIGN KEY (identity_id) REFERENCES profile(identity_id)
+            )
+            """
         )
         db.commit()
 
@@ -99,3 +110,40 @@ class Database:
             [identity_id],
             one=True,
         )
+    
+    def save_task(self, task_id = None, identity_id=None, task_status=None, task_create_time=None):
+        """Persist task information."""
+        log.info(f"Saving task: {task_id}, {identity_id}")
+        db = self.get_db()
+
+        identity_id = str(identity_id) if identity_id is not None else None
+        task_id = str(task_id) if task_id is not None else None
+        task_status = str(task_status) if task_status is not None else None
+        task_create_time = str(task_create_time) if task_create_time is not None else None
+
+        db.execute(
+            """INSERT INTO task (identity_id, task_id, task_status, task_create_time)
+            VALUES (?, ?, ?, ?)""",
+            (identity_id, task_id, task_status, task_create_time),
+        )
+        db.commit()
+
+    def load_tasks(self, identity_id):
+        """Load task data for a specific profile."""
+        log.info(f"Loading task data for identity_id: {identity_id}")
+        return self.query_db(
+            """SELECT task_id, task_status, task_create_time FROM task
+            WHERE identity_id = ?""",
+            [identity_id]
+        )
+
+    def delete_task(self, task_id):
+        """Delete a task."""
+        log.info(f"Deleting task: {task_id}")
+        db = self.get_db()
+        db.execute(
+            """DELETE FROM task
+            WHERE task_id = ?""",
+            [task_id]
+        )
+        db.commit()

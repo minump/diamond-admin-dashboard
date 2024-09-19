@@ -22,22 +22,18 @@ import {
   SelectValue
 } from '@/components/ui/select';
 // Assuming these are the functions that interface with your backend to execute the tasks
-import {
-  singleNodeTask,
-  registerContainer,
-  multiNodeTask
-} from '@/lib/taskHandlers';
+import { submitTask } from '@/lib/taskHandlers';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
 import { useEffect, useState } from 'react';
 
 const formSchema = z.object({
-  taskType: z.enum(['singleNode', 'multiNode']),
+  taskType: z.enum(['submitTask']),
   jobName: z.string().min(2, {
     message: 'Job name must be at least 2 characters.'
   }),
   endpoint: z.string().optional(),
-  container_id: z.string().optional(),
+  log_path: z.string().optional(),
   task: z.string().optional(),
   // base_image: z.string().optional(),
   // image_file_name: z.string().optional(),
@@ -49,8 +45,8 @@ export function JobComposerForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      taskType: 'singleNode',
-      jobName: 'registerContainer'
+      taskType: 'submitTask',
+      jobName: 'submitTask',
     }
   });
 
@@ -76,17 +72,10 @@ export function JobComposerForm() {
     try {
       let response;
       switch (values.taskType) {
-        case 'singleNode':
-          response = await singleNodeTask({
+        case 'submitTask':
+          response = await submitTask({
             endpoint: values.endpoint,
-            container_id: values.container_id,
-            task: values.task
-          });
-          break;
-        case 'multiNode':
-          response = await multiNodeTask({
-            endpoint: values.endpoint,
-            container_id: values.container_id,
+            log_path: values.log_path,
             task: values.task
           });
           break;
@@ -116,8 +105,7 @@ export function JobComposerForm() {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="singleNode">Single Node Task</SelectItem>
-                  <SelectItem value="multiNode">Multi Node Task</SelectItem>
+                  <SelectItem value="submitTask">Submit Task</SelectItem>
                 </SelectContent>
               </Select>
               <FormDescription>
@@ -128,7 +116,7 @@ export function JobComposerForm() {
           )}
         />
 
-        {form.watch('taskType') === 'singleNode' && (
+        {form.watch('taskType') === 'submitTask' && (
           <>
             <FormField
               control={form.control}
@@ -167,46 +155,11 @@ export function JobComposerForm() {
             />
             <FormField
               control={form.control}
-              name="container_id"
+              name="log_path"
               render={({ field }) => (
                 <FormItem className="w-[60%] md:w-[20%]">
-                  <FormLabel>Container ID</FormLabel>
-                  <Input placeholder="Container ID" {...field} />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="task"
-              render={({ field }) => (
-                <FormItem className="w-[80%] md:w-[50%]">
-                  <FormLabel>Task</FormLabel>
-                  <Textarea placeholder="Task details" {...field} />
-                </FormItem>
-              )}
-            />
-          </>
-        )}
-
-        {form.watch('taskType') === 'multiNode' && (
-          <>
-            <FormField
-              control={form.control}
-              name="endpoint"
-              render={({ field }) => (
-                <FormItem className="w-[60%] md:w-[20%]">
-                  <FormLabel>Endpoint</FormLabel>
-                  <Input placeholder="Endpoint URL" {...field} />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="container_id"
-              render={({ field }) => (
-                <FormItem className="w-[60%] md:w-[20%]">
-                  <FormLabel>Container ID</FormLabel>
-                  <Input placeholder="Container ID" {...field} />
+                  <FormLabel>Log Path</FormLabel>
+                  <Input placeholder="Log Path" {...field} />
                 </FormItem>
               )}
             />
