@@ -62,6 +62,10 @@ export default async function RootLayout({
                       <EditIcon className="h-6 w-6" />
                       Job Composer
                     </NavItem>
+                    <NavItem href="/task-manager">
+                      <HomeIcon className="h-6 w-6" />
+                      Task Manager
+                    </NavItem>
                     <NavItem href="/users">
                       <UsersIcon className="h-6 w-6" />
                       Users

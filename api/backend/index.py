@@ -1,5 +1,6 @@
 import logging
 import os
+from datetime import datetime
 
 import requests
 from flask import flash, jsonify, make_response, redirect, request, session, url_for
@@ -99,6 +100,82 @@ def diamond_endpoint_register_container():
     )
     logging.info(container_id)
     return jsonify(container_id)
+
+
+def task_wrapper(task_command, log_path):
+    import os
+    import textwrap
+    command = textwrap.dedent(task_command.strip())
+    os.system(f"({command}) 2>&1 | tee {log_path}")
+    return log_path
+
+
+@app.route("/api/submit_task", methods=["POST"])
+@authenticated
+def diamond_endpoint_submit_job():
+    """
+    Parameters:
+    ----------
+      endpoint_id: str
+      container_id: str
+      task_command: str
+    Returns:
+    --------
+      task_id: str
+    """
+    globus_compute_client = initialize_globus_compute_client()
+
+    endpoint_id = request.json.get("endpoint")
+    function_id = globus_compute_client.register_function(task_wrapper)
+    task_command = request.json.get("task")
+    log_path = request.json.get("log_path")
+
+    logging.info(f"endpoint id is {endpoint_id}")
+    logging.info(f"function id is {function_id}")
+    logging.info(f"task command is {task_command}")
+    logging.info(f"log path is {log_path}")
+
+    task_id = globus_compute_client.run(
+        task_command=task_command,
+        log_path=log_path,
+        endpoint_id=endpoint_id,
+        function_id=function_id,
+    )
+
+    task_create_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    database.save_task(
+        task_id=task_id,
+        identity_id=session["primary_identity"],
+        task_create_time=task_create_time,
+    )
+
+    logging.info(f"task id is {task_id}")
+    return jsonify(task_id)
+
+
+@app.route("/api/get_task_status", methods=["GET"])
+@authenticated
+def diamond_get_task_status():
+    global_compute_client = initialize_globus_compute_client()
+
+    tasks = database.load_tasks(identity_id=session["primary_identity"])
+    tasks_data = {}
+    for task in tasks:
+        task_id = task["task_id"]
+        status = global_compute_client.get_task(task_id)
+        tasks_data[task_id] = status
+        
+    logging.info(f"task status is {tasks_data}")
+    return jsonify(tasks_data)
+
+
+@app.route("/api/delete_task", methods=["POST"])
+@authenticated
+def diamond_delete_task():
+    task_id = request.json.get("taskId")
+    database.delete_task(task_id)
+    logging.info(f"task {task_id} deleted")
+    return jsonify({"message": "Task deleted successfully"})
 
 
 @app.route("/api/logout", methods=["GET"])
@@ -311,22 +388,6 @@ def authcallback():
 def loadprofile():
     log.info("loadprofile route")
     return redirect(url_for("profile"))
-
-
-# @app.route("/api/register_container", methods=["POST"])
-# def registerContainer():
-#     request_data = request.get_json()
-#     base_image = request_data["base_image"]
-#     image_file_name = request_data["image_file_name"]
-#     endpoint = request_data["endpoint"]
-#     work_path = request_data["work_path"]
-#     register_container(
-#         endpoint_id=endpoint,
-#         work_path=work_path,
-#         base_image=base_image,
-#         image_file_name=image_file_name,
-#     )
-#     return jsonify({"message": "Container registered successfully"})
 
 
 if __name__ == "__main__":
