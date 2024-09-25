@@ -20,8 +20,9 @@ export async function submitTask(data: any) {
 }
 
 export async function registerContainer(data: {
+  endpoint: string;
   base_image: string;
-  container_type: string;
+  location: string;
   name: string;
   description: string;
 }): Promise<any> {

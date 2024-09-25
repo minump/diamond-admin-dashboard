@@ -1,171 +1,95 @@
 'use client';
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { Button } from '@/components/ui/button';
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from '@/components/ui/select';
-// Assuming these are the functions that interface with your backend to execute the tasks
-import {
-  singleNodeTask,
-  registerContainer,
-  multiNodeTask
-} from '@/lib/taskHandlers';
-import { Textarea } from '@/components/ui/textarea';
-import { useToast } from '@/components/ui/use-toast';
 import { useEffect, useState } from 'react';
 
-const formSchema = z.object({
-  endpoint: z.string().optional(),
-  container_type: z.string().optional(),
-  name: z.string().min(2, {
-    message: 'Job name must be at least 2 characters.'
-  }),
-  description: z.string().optional(),
-  base_image: z.string().optional()
-});
+export function ContainerManagerForm() {
+  const [containersData, setContainersData] = useState({});
 
-export function ImageManagerForm() {
-  const { toast } = useToast();
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {}
-  });
+  const fetchContainerStatus = async () => {
+    try {
+      const response = await fetch('/api/get_containers', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      const data = await response.json();
+      setContainersData(data);
+    } catch (error) {
+      console.error('Error fetching container status:', error);
+    }
+  };
 
-  const [endpoints, setEndpoints] = useState<
-    { endpoint_uuid: string; endpoint_name: string }[]
-  >([]);
+  const deleteContainer = async (containerId) => {
+    try {
+      const response = await fetch('/api/delete_container', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ containerId }),
+      });
+
+      if (response.ok) {
+        // If the delete request is successful, remove the container from the state
+        setContainersData((prevContainersData) => {
+          const newContainersData = { ...prevContainersData };
+          delete newContainersData[containerId]; // Remove the deleted container
+          return newContainersData;
+        });
+      } else {
+        console.error('Failed to delete container');
+      }
+    } catch (error) {
+      console.error('Error deleting container:', error);
+    }
+  };
 
   useEffect(() => {
-    async function fetchEndpoints() {
-      try {
-        const response = await fetch('/api/list_active_endpoints');
-        const data = await response.json();
-        setEndpoints(data);
-      } catch (error) {
-        console.error('Error fetching endpoints:', error);
-      }
-    }
-    fetchEndpoints();
-    console.log('Endpoints:', endpoints);
+    fetchContainerStatus();
+    const intervalId = setInterval(fetchContainerStatus, 5000);
+    return () => clearInterval(intervalId);
   }, []);
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    try {
-      const response = await registerContainer({
-        base_image: values.base_image ?? '',
-        container_type: values.container_type ?? '',
-        name: values.name ?? '',
-        description: values.description ?? ''
-      });
-      console.log('response after register container:', response);
-      if (response !== null) {
-        console.log('response in form:', response);
-        toast({
-          title: 'Success',
-          description: response.message
-        });
-      }
-      console.log('Task triggered successfully:', response);
-    } catch (error) {
-      console.error('Error triggering task:', error);
-    }
-  }
-
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-full">
-        <FormField
-          control={form.control}
-          name="endpoint"
-          render={({ field }) => (
-            <FormItem className="w-[60%] md:w-[20%]">
-              <FormLabel>Endpoint</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select endpoint" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {endpoints.length > 0 ? (
-                    endpoints.map((endpoint) => (
-                      <SelectItem
-                        key={endpoint.endpoint_uuid}
-                        value={endpoint.endpoint_uuid}
-                      >
-                        {endpoint.endpoint_name}
-                      </SelectItem>
-                    ))
-                  ) : (
-                    <SelectItem value="none" disabled>
-                      No endpoints available
-                    </SelectItem>
-                  )}
-                </SelectContent>
-              </Select>
-            </FormItem>
+    <div>
+      <table className="table-auto border-collapse w-full">
+        <thead>
+          <tr>
+            <th className="border px-4 py-2">Container Name</th>
+            <th className="border px-4 py-2">Container Status</th>
+            <th className="border px-4 py-2">Base Image</th>
+            <th className="border px-4 py-2">Location</th>
+            <th className="border px-4 py-2">Description</th>
+            <th className="border px-4 py-2">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {Object.keys(containersData).length > 0 ? (
+            Object.keys(containersData).map((containerName) => (
+              <tr key={containerName}>
+                <td className="border px-4 py-2">{containerName}</td>
+                <td className="border px-4 py-2">{containersData[containerName]?.status || ''}</td>
+                <td className="border px-4 py-2">{containersData[containerName]?.base_image || ''}</td>
+                <td className="border px-4 py-2">{containersData[containerName]?.location || ''}</td>
+                <td className="border px-4 py-2">{containersData[containerName]?.description || ''}</td>
+                <td className="border px-4 py-2">
+                  <button
+                    onClick={() => deleteContainer(containersData[containerName]?.container_task_id)}
+                    className="bg-red-500 text-white px-4 py-1 rounded hover:bg-red-700"
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td className="border px-4 py-2" colSpan="5">No containers found.</td>
+            </tr>
           )}
-        />
-        <FormField
-          control={form.control}
-          name="base_image"
-          render={({ field }) => (
-            <FormItem className="w-[60%] md:w-[20%]">
-              <FormLabel>Base Image</FormLabel>
-              <Input placeholder="Base Image" {...field} />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="container_type"
-          render={({ field }) => (
-            <FormItem className="w-[60%] md:w-[20%]">
-              <FormLabel>Container Type</FormLabel>
-              <Input placeholder="Container Type" {...field} />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem className="w-[60%] md:w-[20%]">
-              <FormLabel>Name</FormLabel>
-              <Input placeholder="Name" {...field} />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem className="w-[80%] md:w-[50%]">
-              <FormLabel>Description</FormLabel>
-              <Textarea placeholder="Description" {...field} />
-            </FormItem>
-          )}
-        />
-
-        <Button type="submit">Submit</Button>
-      </form>
-    </Form>
+        </tbody>
+      </table>
+    </div>
   );
 }
