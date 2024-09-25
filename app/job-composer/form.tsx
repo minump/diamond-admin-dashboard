@@ -36,7 +36,7 @@ const formSchema = z.object({
   log_path: z.string().optional(),
   task: z.string().optional(),
   // base_image: z.string().optional(),
-  // image_file_name: z.string().optional(),
+  container_path: z.string().optional(),
   work_path: z.string().optional()
 });
 
@@ -76,12 +76,19 @@ export function JobComposerForm() {
           response = await submitTask({
             endpoint: values.endpoint,
             log_path: values.log_path,
-            task: values.task
+            task: values.task,
+            container_path: values.container_path
           });
           break;
         default:
           console.error('Invalid task type');
           return;
+      }
+      if (response !== null) {
+        console.log('response in form:', response);
+        toast({
+          title: 'Success',
+        });
       }
       console.log('Task triggered successfully:', response);
     } catch (error) {
@@ -160,6 +167,16 @@ export function JobComposerForm() {
                 <FormItem className="w-[60%] md:w-[20%]">
                   <FormLabel>Log Path</FormLabel>
                   <Input placeholder="Log Path" {...field} />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="container_path"
+              render={({ field }) => (
+                <FormItem className="w-[60%] md:w-[20%]">
+                  <FormLabel>Container Path</FormLabel>
+                  <Input placeholder="Container Path" {...field} />
                 </FormItem>
               )}
             />
