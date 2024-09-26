@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 
 export function ContainerManagerForm() {
-  const [containersData, setContainersData] = useState({});
+  const [containersData, setContainersData] = useState<{ [key: string]: any }>({});
 
   const fetchContainerStatus = async () => {
     try {
@@ -20,7 +20,7 @@ export function ContainerManagerForm() {
     }
   };
 
-  const deleteContainer = async (containerId) => {
+  const deleteContainer = async (containerId: string) => {
     try {
       const response = await fetch('/api/delete_container', {
         method: 'POST',
@@ -85,7 +85,7 @@ export function ContainerManagerForm() {
             ))
           ) : (
             <tr>
-              <td className="border px-4 py-2" colSpan="5">No containers found.</td>
+              <td className="border px-4 py-2" colSpan={5}>No containers found.</td>
             </tr>
           )}
         </tbody>
