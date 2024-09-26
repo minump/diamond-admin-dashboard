@@ -1,14 +1,13 @@
-import type { Config } from 'tailwindcss';
-
-export default {
+/** @type {import('tailwindcss').Config} */
+module.exports = {
   darkMode: ['class'],
   content: [
     './pages/**/*.{ts,tsx}',
     './components/**/*.{ts,tsx}',
+    './constants/**/*.{ts,tsx}',
     './app/**/*.{ts,tsx}',
     './src/**/*.{ts,tsx}'
   ],
-  prefix: '',
   theme: {
     container: {
       center: true,
@@ -51,6 +50,67 @@ export default {
         card: {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))'
+        },
+        // Add the new color palette
+        baby_powder: {
+          DEFAULT: '#fbfef9',
+          100: '#2b560f',
+          200: '#57ad1d',
+          300: '#89e14e',
+          400: '#c2f0a4',
+          500: '#fbfef9',
+          600: '#fdfefc',
+          700: '#fdfffc',
+          800: '#fefffd',
+          900: '#fefffe'
+        },
+        raisin_black: {
+          DEFAULT: '#191923',
+          100: '#050507',
+          200: '#0a0a0e',
+          300: '#0f0f15',
+          400: '#14141d',
+          500: '#191923',
+          600: '#3f3f58',
+          700: '#64648d',
+          800: '#9696b4',
+          900: '#cacada'
+        },
+        honolulu_blue: {
+          DEFAULT: '#0e79b2',
+          100: '#031824',
+          200: '#063148',
+          300: '#09496c',
+          400: '#0c618f',
+          500: '#0e79b2',
+          600: '#15a1ec',
+          700: '#50b8f1',
+          800: '#8ad0f6',
+          900: '#c5e7fa'
+        },
+        rose_red: {
+          DEFAULT: '#bf1363',
+          100: '#260414',
+          200: '#4c0828',
+          300: '#720b3b',
+          400: '#980f4f',
+          500: '#bf1363',
+          600: '#e92480',
+          700: '#ef5ba0',
+          800: '#f491c0',
+          900: '#fac8df'
+        },
+        carrot_orange: {
+          DEFAULT: '#f39237',
+          100: '#381d03',
+          200: '#703907',
+          300: '#a8560a',
+          400: '#e0730d',
+          500: '#f39237',
+          600: '#f6a75d',
+          700: '#f8bd86',
+          800: '#fad3ae',
+          900: '#fde9d7'
         }
       },
       borderRadius: {
@@ -60,12 +120,12 @@ export default {
       },
       keyframes: {
         'accordion-down': {
-          from: { height: '0' },
+          from: { height: 0 },
           to: { height: 'var(--radix-accordion-content-height)' }
         },
         'accordion-up': {
           from: { height: 'var(--radix-accordion-content-height)' },
-          to: { height: '0' }
+          to: { height: 0 }
         }
       },
       animation: {
@@ -75,4 +135,4 @@ export default {
     }
   },
   plugins: [require('tailwindcss-animate')]
-} satisfies Config;
+};
