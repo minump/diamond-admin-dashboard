@@ -6,7 +6,8 @@ import {
   SettingsIcon,
   EditIcon,
   UsersIcon,
-  HomeIcon
+  FolderIcon,
+  TaskIcon,
 } from '@/components/icons';
 import { NavItem } from './nav-item';
 import { is_authenticated, signOut } from '@/lib/authUtils';
@@ -61,13 +62,21 @@ export default async function RootLayout({
                       <DashboardIcon className="h-6 w-6" />
                       Dashboard
                     </NavItem>
-                    <NavItem href="/image-manager">
+                    <NavItem href="/image-builder">
                       <GlobeIcon className="h-6 w-6" />
+                      Image Builder
+                    </NavItem>
+                    <NavItem href="/image-manager">
+                      <FolderIcon className="h-6 w-6" />
                       Image Manager
                     </NavItem>
                     <NavItem href="/job-composer">
                       <EditIcon className="h-6 w-6" />
                       Job Composer
+                    </NavItem>
+                    <NavItem href="/task-manager">
+                      <TaskIcon className="h-6 w-6" />
+                      Task Manager
                     </NavItem>
                     <NavItem href="/users">
                       <UsersIcon className="h-6 w-6" />

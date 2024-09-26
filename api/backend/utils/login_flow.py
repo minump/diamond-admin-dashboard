@@ -6,6 +6,7 @@ from flask import request
 from globus_compute_sdk import Client as GlobusComputeClient
 from globus_compute_sdk.sdk.login_manager import AuthorizerLoginManager
 from globus_compute_sdk.sdk.login_manager.manager import ComputeScopeBuilder
+from globus_compute_sdk.serialize import CombinedCode
 from globus_sdk.scopes import AuthScopes
 
 
@@ -47,4 +48,4 @@ def initialize_compute_login_manager() -> AuthorizerLoginManager:
 
 def initialize_globus_compute_client() -> GlobusComputeClient:
     login_manager = initialize_compute_login_manager()
-    return GlobusComputeClient(login_manager=login_manager)
+    return GlobusComputeClient(login_manager=login_manager, code_serialization_strategy=CombinedCode())

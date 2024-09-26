@@ -1,8 +1,8 @@
 import { toast } from '@/components/ui/use-toast';
 
-export async function singleNodeTask(data: any) {
+export async function submitTask(data: any) {
   try {
-    const response = await fetch(`/api/single_node_task`, {
+    const response = await fetch(`/api/submit_task`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -15,13 +15,14 @@ export async function singleNodeTask(data: any) {
     const responseData = await response.json();
     console.log(responseData);
   } catch (error) {
-    console.error('Error in singleNodeTask:', error);
+    console.error('Error in task submitting:', error);
   }
 }
 
 export async function registerContainer(data: {
+  endpoint: string;
   base_image: string;
-  container_type: string;
+  location: string;
   name: string;
   description: string;
 }): Promise<any> {
@@ -47,27 +48,5 @@ export async function registerContainer(data: {
     return responseData;
   } catch (error) {
     console.error('Error in registerContainer:', error);
-  }
-}
-
-export async function multiNodeTask(data: any) {
-  try {
-    const response = await fetch(
-      `${process.env.VERCEL_URL}/api/multi_node_task`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-      }
-    );
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
-    }
-    const responseData = await response.json();
-    console.log(responseData);
-  } catch (error) {
-    console.error('Error in multiNodeTask:', error);
   }
 }
