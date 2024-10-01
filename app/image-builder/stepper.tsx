@@ -54,7 +54,7 @@ type FormData = z.infer<typeof baseImageSchema> &
   z.infer<typeof commandsSchema>
 
 type baseImageFormValues = z.infer<typeof baseImageSchema>
-type depenenciesFormValues = z.infer<typeof dependenciesSchema>
+type dependenciesFormValues = z.infer<typeof dependenciesSchema>
 type envrionmentFormValues = z.infer<typeof environmentSchema>
 type commandsFormValues = z.infer<typeof commandsSchema>
 
@@ -250,7 +250,6 @@ function BaseImageStep(){
     formState: {errors},
    } = useFormContext<baseImageFormValues>();
   
-
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4">Base Image</h2>
