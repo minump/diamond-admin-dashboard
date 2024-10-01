@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 
 export function TaskManagerForm() {
-  const [tasksData, setTasksData] = useState({});
+  const [tasksData, setTasksData] = useState<Record<string, any>>({});
 
   const fetchTaskStatus = async () => {
     try {
@@ -20,7 +20,7 @@ export function TaskManagerForm() {
     }
   };
 
-  const deletetask = async (taskId) => {
+  const deletetask = async (taskId: string) => {
     try {
       const response = await fetch('/api/delete_task', {
         method: 'POST',
@@ -33,7 +33,7 @@ export function TaskManagerForm() {
       if (response.ok) {
         // If the delete request is successful, remove the task from the state
         setTasksData((prevtasksData) => {
-          const newTasksData = { ...prevtasksData };
+          const newTasksData: { [key: string]: any }  = { ...prevtasksData };
           delete newTasksData[taskId]; // Remove the deleted task
           return newTasksData;
         });
@@ -83,7 +83,7 @@ export function TaskManagerForm() {
             ))
           ) : (
             <tr>
-              <td className="border px-4 py-2" colSpan="5">No tasks found.</td>
+              <td className="border px-4 py-2" colSpan={5}>No tasks found.</td>
             </tr>
           )}
         </tbody>
