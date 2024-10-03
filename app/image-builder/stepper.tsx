@@ -83,9 +83,18 @@ export function ImageBuilderStepper() {
   const handleFinalSubmit = async (data: FormData) => {
     setIsLoading(true)
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000))
-      console.log('Submitted data:', data)
+      const response = await fetch('/api/register_container', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      })
+
+      if (!response.ok) throw new Error('Failed to submit image build configuration')
+
+      const result = await response.json()
+      console.log('Submitted data:', result)
       toast({
         title: 'Success',
         description: 'Image build configuration submitted successfully!',
@@ -259,7 +268,7 @@ function DependenciesStep(){
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4">Dependencies</h2>
-      <label htmlFor={register('dependencies').name}>Dependencies</label>
+      <label htmlFor={register('dependencies').name}>Copy Pasta your requirements.txt here</label>
       <Input placeholder="e.g., numpy==1.21.0&#10;pandas==1.3.0" {...register('dependencies')} />
       {/* <FormField
         control={form.control}
@@ -328,7 +337,7 @@ function CommandsStep() {
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4">Build Commands</h2>
-      <label htmlFor={register('commands').name}>Dependencies</label>
+      <label htmlFor={register('commands').name}>Insert your build commands here</label>
       <Input placeholder="e.g., pip install -r requirements.txt&#10;python setup.py install" {...register('commands')} />
       {/* <FormField
         control={form.control}
