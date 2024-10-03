@@ -86,10 +86,10 @@ export default async function RootLayout({
                       <SettingsIcon className="h-6 w-6" />
                       Settings
                     </NavItem>
-                    <NavItem href="/image-builder">
+                    {/* <NavItem href="/image-builder">
                       <ImageIcon className="h-6 w-6" />
                       Image Builder
-                    </NavItem>
+                    </NavItem> */}
                   </nav>
                 ) : (
                   <></>

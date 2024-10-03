@@ -132,19 +132,19 @@ function StepperContent({
     defaultValues: formData
   })
 
-  // const onSubmit = (values: z.infer<typeof stepper.current.schema>) => {
-  //   console.log(`Form values for step ${stepper.current.id}:`, values);
-  //   if(stepper.isLast){
-  //     console.log("Last")
-  //     stepper.reset();
-  //   }
-  //   else{
-  //     console.log("Else");
-  //     stepper.next();
-  //   }
-
-
-  // }
+  const onSubmit = (values: z.infer<typeof stepper.current.schema>) => {
+    console.log(`Form values for step ${stepper.current.id}:`, values);
+    if(stepper.isLast){
+      console.log("Last")
+      onFinalSubmit(values as FormData);
+      stepper.reset();
+    }
+    else{
+      console.log("Else");
+      stepper.next();
+    }
+    onStepSubmit(values as FormData);
+  }
 
 
   return (
@@ -160,7 +160,7 @@ function StepperContent({
             dependencies: () => <DependenciesStep/>,
             environment: () => <EnvironmentStep/>,
             commands: () => <CommandsStep/>,
-            review: () => <ReviewStep/>
+            review: () => <ReviewStep onSubmit={onSubmit} isLoading={isLoading}/>
           })}
         </form>
       </Form>
@@ -353,7 +353,7 @@ function CommandsStep() {
   )
 }
 
-function ReviewStep() {
+function ReviewStep({onSubmit, isLoading}: {onSubmit: (data: fullFormValues) => void, isLoading: boolean}) {
   const {
     watch,
     formState: { errors },
@@ -381,9 +381,9 @@ function ReviewStep() {
           <pre className="bg-muted/50 dark:bg-muted p-2 rounded-md">{formData.commands}</pre>
         </div>
       </div>
-      {/* <Button
+      <Button
         type="button"
-        onClick={onSubmit}
+        onClick={() => onSubmit(formData)}
         disabled={isLoading}
         className="mt-4 bg-primary text-primary-foreground hover:bg-primary/90"
       >
@@ -395,7 +395,7 @@ function ReviewStep() {
         ) : (
           'Submit'
         )}
-      </Button> */}
+      </Button>
     </div>
   )
 }
