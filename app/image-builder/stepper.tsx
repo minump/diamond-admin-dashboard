@@ -3,8 +3,8 @@
 import { useState } from 'react'
 import { defineStepper } from '@stepperize/react'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
+import { useForm, useFormContext, UseFormReturn } from 'react-hook-form'
+import { Schema, z } from 'zod'
 import { Button } from '@/components/ui/button'
 import {
   Form,
@@ -13,20 +13,14 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage
+  FormMessage,
+  useFormField
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { useToast } from '@/components/ui/use-toast'
 import { Loader2 } from 'lucide-react'
 
-const { Scoped, useStepper } = defineStepper(
-  { id: 'base-image', title: 'Base Image' },
-  { id: 'dependencies', title: 'Dependencies' },
-  { id: 'environment', title: 'Environment Variables' },
-  { id: 'commands', title: 'Build Commands' },
-  { id: 'review', title: 'Review' }
-)
 
 const baseImageSchema = z.object({
   baseImage: z.string().min(1, 'Base image is required')
@@ -46,10 +40,28 @@ const commandsSchema = z.object({
 
 const reviewSchema = z.object({})
 
+const { Scoped, useStepper } = defineStepper(
+  { id: 'base-image', title: 'Base Image', schema: baseImageSchema},
+  { id: 'dependencies', title: 'Dependencies', schema: dependenciesSchema },
+  { id: 'environment', title: 'Environment Variables', schema: environmentSchema },
+  { id: 'commands', title: 'Build Commands', schema: commandsSchema },
+  { id: 'review', title: 'Review', schema: reviewSchema }
+)
+
 type FormData = z.infer<typeof baseImageSchema> &
   z.infer<typeof dependenciesSchema> &
   z.infer<typeof environmentSchema> &
   z.infer<typeof commandsSchema>
+
+type baseImageFormValues = z.infer<typeof baseImageSchema>
+type dependenciesFormValues = z.infer<typeof dependenciesSchema>
+type envrionmentFormValues = z.infer<typeof environmentSchema>
+type commandsFormValues = z.infer<typeof commandsSchema>
+type fullFormValues = baseImageFormValues &
+  dependenciesFormValues &
+  envrionmentFormValues &
+  commandsFormValues
+
 
 export function ImageBuilderStepper() {
   const [formData, setFormData] = useState<Partial<FormData>>({})
@@ -62,8 +74,11 @@ export function ImageBuilderStepper() {
   })
 
   const handleStepSubmit = (stepData: Partial<FormData>) => {
+    console.log(stepData);
     setFormData((prev) => ({ ...prev, ...stepData }))
   }
+
+  // const onSubmit = (values: z.infer<typeof stepper)
 
   const handleFinalSubmit = async (data: FormData) => {
     setIsLoading(true)
@@ -117,6 +132,21 @@ function StepperContent({
     defaultValues: formData
   })
 
+  // const onSubmit = (values: z.infer<typeof stepper.current.schema>) => {
+  //   console.log(`Form values for step ${stepper.current.id}:`, values);
+  //   if(stepper.isLast){
+  //     console.log("Last")
+  //     stepper.reset();
+  //   }
+  //   else{
+  //     console.log("Else");
+  //     stepper.next();
+  //   }
+
+
+  // }
+
+
   return (
     // <div className="w-full max-w-2xl mx-auto bg-card dark:bg-card/80 p-6 rounded-xl shadow-lg border border-border">
     <div className="bg-card dark:bg-card/80 shadow-lg rounded-xl p-6 border border-border">
@@ -124,51 +154,13 @@ function StepperContent({
         <StepIndicator />
       </div>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(() => {})}>
+        <form onSubmit={form.handleSubmit(onStepSubmit)}>
           {stepper.switch({
-            'base-image': () => (
-              <BaseImageStep
-                onSubmit={(data) => {
-                  onStepSubmit(data)
-                  stepper.next()
-                }}
-                defaultValue={formData.baseImage}
-              />
-            ),
-            dependencies: () => (
-              <DependenciesStep
-                onSubmit={(data) => {
-                  onStepSubmit(data)
-                  stepper.next()
-                }}
-                defaultValue={formData.dependencies}
-              />
-            ),
-            environment: () => (
-              <EnvironmentStep
-                onSubmit={(data) => {
-                  onStepSubmit(data)
-                  stepper.next()
-                }}
-                defaultValue={formData.environment}
-              />
-            ),
-            commands: () => (
-              <CommandsStep
-                onSubmit={(data) => {
-                  onStepSubmit(data)
-                  stepper.next()
-                }}
-                defaultValue={formData.commands}
-              />
-            ),
-            review: () => (
-              <ReviewStep
-                formData={formData as FormData}
-                onSubmit={() => onFinalSubmit(formData as FormData)}
-                isLoading={isLoading}
-              />
-            )
+            'base-image': () => <BaseImageStep/>,
+            dependencies: () => <DependenciesStep/>,
+            environment: () => <EnvironmentStep/>,
+            commands: () => <CommandsStep/>,
+            review: () => <ReviewStep/>
           })}
         </form>
       </Form>
@@ -226,22 +218,18 @@ function StepIndicator() {
   )
 }
 
-function BaseImageStep({
-  onSubmit,
-  defaultValue
-}: {
-  onSubmit: (data: { baseImage: string }) => void
-  defaultValue?: string
-}) {
-  const form = useForm<z.infer<typeof baseImageSchema>>({
-    resolver: zodResolver(baseImageSchema),
-    defaultValues: { baseImage: defaultValue || '' }
-  })
-
+function BaseImageStep(){
+  const {
+    register,
+    formState: {errors},
+   } = useFormContext<baseImageFormValues>();
+  
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4">Base Image</h2>
-      <FormField
+      <label htmlFor={register('baseImage').name}>Base Image</label>
+      <Input placeholder="e.g., python:3.9-slim" {...register('baseImage')} />
+      {/* <FormField
         control={form.control}
         name="baseImage"
         render={({ field }) => (
@@ -256,27 +244,24 @@ function BaseImageStep({
             <FormMessage />
           </FormItem>
         )}
-      />
+      /> */}
+
     </div>
-  )
+  );
 }
 
-function DependenciesStep({
-  onSubmit,
-  defaultValue
-}: {
-  onSubmit: (data: { dependencies: string }) => void
-  defaultValue?: string
-}) {
-  const form = useForm<z.infer<typeof dependenciesSchema>>({
-    resolver: zodResolver(dependenciesSchema),
-    defaultValues: { dependencies: defaultValue || '' }
-  })
+function DependenciesStep(){
+  const {
+    register,
+    formState: {errors},
+   } = useFormContext<dependenciesFormValues>();
 
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4">Dependencies</h2>
-      <FormField
+      <label htmlFor={register('dependencies').name}>Dependencies</label>
+      <Input placeholder="e.g., numpy==1.21.0&#10;pandas==1.3.0" {...register('dependencies')} />
+      {/* <FormField
         control={form.control}
         name="dependencies"
         render={({ field }) => (
@@ -294,27 +279,24 @@ function DependenciesStep({
             <FormMessage />
           </FormItem>
         )}
-      />
+      /> */}
     </div>
   )
 }
 
-function EnvironmentStep({
-  onSubmit,
-  defaultValue
-}: {
-  onSubmit: (data: { environment: string }) => void
-  defaultValue?: string
-}) {
-  const form = useForm<z.infer<typeof environmentSchema>>({
-    resolver: zodResolver(environmentSchema),
-    defaultValues: { environment: defaultValue || '' }
-  })
+function EnvironmentStep() {
+
+  const {
+    register,
+    formState: {errors},
+   } = useFormContext<envrionmentFormValues>();
 
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4">Environment Variables</h2>
-      <FormField
+      <label htmlFor={register('environment').name}>Dependencies</label>
+      <Input placeholder="e.g., DEBUG=1&#10;API_KEY=your_api_key" {...register('environment')} />
+      {/* <FormField
         control={form.control}
         name="environment"
         render={({ field }) => (
@@ -332,27 +314,23 @@ function EnvironmentStep({
             <FormMessage />
           </FormItem>
         )}
-      />
+      /> */}
     </div>
   )
 }
 
-function CommandsStep({
-  onSubmit,
-  defaultValue
-}: {
-  onSubmit: (data: { commands: string }) => void
-  defaultValue?: string
-}) {
-  const form = useForm<z.infer<typeof commandsSchema>>({
-    resolver: zodResolver(commandsSchema),
-    defaultValues: { commands: defaultValue || '' }
-  })
+function CommandsStep() {
+  const {
+    register,
+    formState: {errors},
+   } = useFormContext<commandsFormValues>();
 
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4">Build Commands</h2>
-      <FormField
+      <label htmlFor={register('commands').name}>Dependencies</label>
+      <Input placeholder="e.g., pip install -r requirements.txt&#10;python setup.py install" {...register('commands')} />
+      {/* <FormField
         control={form.control}
         name="commands"
         render={({ field }) => (
@@ -370,20 +348,18 @@ function CommandsStep({
             <FormMessage />
           </FormItem>
         )}
-      />
+      /> */}
     </div>
   )
 }
 
-function ReviewStep({
-  formData,
-  onSubmit,
-  isLoading
-}: {
-  formData: FormData
-  onSubmit: () => void
-  isLoading: boolean
-}) {
+function ReviewStep() {
+  const {
+    watch,
+    formState: { errors },
+  } = useFormContext<fullFormValues>();
+  const formData = watch();
+  
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4 text-foreground">Review</h2>
@@ -405,7 +381,7 @@ function ReviewStep({
           <pre className="bg-muted/50 dark:bg-muted p-2 rounded-md">{formData.commands}</pre>
         </div>
       </div>
-      <Button
+      {/* <Button
         type="button"
         onClick={onSubmit}
         disabled={isLoading}
@@ -419,7 +395,7 @@ function ReviewStep({
         ) : (
           'Submit'
         )}
-      </Button>
+      </Button> */}
     </div>
   )
 }
