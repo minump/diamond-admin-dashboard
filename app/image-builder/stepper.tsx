@@ -57,6 +57,10 @@ type baseImageFormValues = z.infer<typeof baseImageSchema>
 type dependenciesFormValues = z.infer<typeof dependenciesSchema>
 type envrionmentFormValues = z.infer<typeof environmentSchema>
 type commandsFormValues = z.infer<typeof commandsSchema>
+type fullFormValues = baseImageFormValues &
+  dependenciesFormValues &
+  envrionmentFormValues &
+  commandsFormValues
 
 
 export function ImageBuilderStepper() {
@@ -128,19 +132,19 @@ function StepperContent({
     defaultValues: formData
   })
 
-  const onSubmit = (values: z.infer<typeof stepper.current.schema>) => {
-    console.log(`Form values for step ${stepper.current.id}:`, values);
-    if(stepper.isLast){
-      console.log("Last")
-      stepper.reset();
-    }
-    else{
-      console.log("Else");
-      stepper.next();
-    }
+  // const onSubmit = (values: z.infer<typeof stepper.current.schema>) => {
+  //   console.log(`Form values for step ${stepper.current.id}:`, values);
+  //   if(stepper.isLast){
+  //     console.log("Last")
+  //     stepper.reset();
+  //   }
+  //   else{
+  //     console.log("Else");
+  //     stepper.next();
+  //   }
 
 
-  }
+  // }
 
 
   return (
@@ -153,40 +157,10 @@ function StepperContent({
         <form onSubmit={form.handleSubmit(onStepSubmit)}>
           {stepper.switch({
             'base-image': () => <BaseImageStep/>,
-            dependencies: () => (
-              <DependenciesStep
-                onSubmit={(data) => {
-                  onStepSubmit(data)
-                  stepper.next()
-                }}
-                defaultValue={formData.dependencies}
-              />
-            ),
-            environment: () => (
-              <EnvironmentStep
-                onSubmit={(data) => {
-                  onStepSubmit(data)
-                  stepper.next()
-                }}
-                defaultValue={formData.environment}
-              />
-            ),
-            commands: () => (
-              <CommandsStep
-                onSubmit={(data) => {
-                  onStepSubmit(data)
-                  stepper.next()
-                }}
-                defaultValue={formData.commands}
-              />
-            ),
-            // review: () => (
-            //   <ReviewStep
-            //     formData={formData as FormData}
-            //     onSubmit={() => onFinalSubmit(formData as FormData)}
-            //     isLoading={isLoading}
-            //   />
-            // )
+            dependencies: () => <DependenciesStep/>,
+            environment: () => <EnvironmentStep/>,
+            commands: () => <CommandsStep/>,
+            review: () => <ReviewStep/>
           })}
         </form>
       </Form>
@@ -276,22 +250,18 @@ function BaseImageStep(){
   );
 }
 
-function DependenciesStep({
-  onSubmit,
-  defaultValue
-}: {
-  onSubmit: (data: { dependencies: string }) => void
-  defaultValue?: string
-}) {
-  const form = useForm<z.infer<typeof dependenciesSchema>>({
-    resolver: zodResolver(dependenciesSchema),
-    defaultValues: { dependencies: defaultValue || '' }
-  })
+function DependenciesStep(){
+  const {
+    register,
+    formState: {errors},
+   } = useFormContext<dependenciesFormValues>();
 
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4">Dependencies</h2>
-      <FormField
+      <label htmlFor={register('dependencies').name}>Dependencies</label>
+      <Input placeholder="e.g., numpy==1.21.0&#10;pandas==1.3.0" {...register('dependencies')} />
+      {/* <FormField
         control={form.control}
         name="dependencies"
         render={({ field }) => (
@@ -309,27 +279,24 @@ function DependenciesStep({
             <FormMessage />
           </FormItem>
         )}
-      />
+      /> */}
     </div>
   )
 }
 
-function EnvironmentStep({
-  onSubmit,
-  defaultValue
-}: {
-  onSubmit: (data: { environment: string }) => void
-  defaultValue?: string
-}) {
-  const form = useForm<z.infer<typeof environmentSchema>>({
-    resolver: zodResolver(environmentSchema),
-    defaultValues: { environment: defaultValue || '' }
-  })
+function EnvironmentStep() {
+
+  const {
+    register,
+    formState: {errors},
+   } = useFormContext<envrionmentFormValues>();
 
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4">Environment Variables</h2>
-      <FormField
+      <label htmlFor={register('environment').name}>Dependencies</label>
+      <Input placeholder="e.g., DEBUG=1&#10;API_KEY=your_api_key" {...register('environment')} />
+      {/* <FormField
         control={form.control}
         name="environment"
         render={({ field }) => (
@@ -347,27 +314,23 @@ function EnvironmentStep({
             <FormMessage />
           </FormItem>
         )}
-      />
+      /> */}
     </div>
   )
 }
 
-function CommandsStep({
-  onSubmit,
-  defaultValue
-}: {
-  onSubmit: (data: { commands: string }) => void
-  defaultValue?: string
-}) {
-  const form = useForm<z.infer<typeof commandsSchema>>({
-    resolver: zodResolver(commandsSchema),
-    defaultValues: { commands: defaultValue || '' }
-  })
+function CommandsStep() {
+  const {
+    register,
+    formState: {errors},
+   } = useFormContext<commandsFormValues>();
 
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4">Build Commands</h2>
-      <FormField
+      <label htmlFor={register('commands').name}>Dependencies</label>
+      <Input placeholder="e.g., pip install -r requirements.txt&#10;python setup.py install" {...register('commands')} />
+      {/* <FormField
         control={form.control}
         name="commands"
         render={({ field }) => (
@@ -385,57 +348,54 @@ function CommandsStep({
             <FormMessage />
           </FormItem>
         )}
-      />
+      /> */}
     </div>
   )
 }
 
-// function ReviewStep({
-//   formData,
-//   onSubmit,
-//   isLoading
-// }: {
-//   formData: FormData
-//   onSubmit: () => void
-//   isLoading: boolean
-// }) {
-//   console.log(formData.baseImage);
-//   return (
-//     <div>
-//       <h2 className="text-2xl font-bold mb-4 text-foreground">Review</h2>
-//       <div className="space-y-4">
-//         <div>
-//           <h3 className="font-semibold text-foreground">Base Image:</h3>
-//           <p className="bg-muted/50 dark:bg-muted p-2 rounded-md">{formData.baseImage}</p>
-//         </div>
-//         <div>
-//           <h3 className="font-semibold text-foreground">Dependencies:</h3>
-//           <pre className="bg-muted/50 dark:bg-muted p-2 rounded-md">{formData.dependencies}</pre>
-//         </div>
-//         <div>
-//           <h3 className="font-semibold text-foreground">Environment Variables:</h3>
-//           <pre className="bg-muted/50 dark:bg-muted p-2 rounded-md">{formData.environment}</pre>
-//         </div>
-//         <div>
-//           <h3 className="font-semibold text-foreground">Build Commands:</h3>
-//           <pre className="bg-muted/50 dark:bg-muted p-2 rounded-md">{formData.commands}</pre>
-//         </div>
-//       </div>
-//       <Button
-//         type="button"
-//         onClick={onSubmit}
-//         disabled={isLoading}
-//         className="mt-4 bg-primary text-primary-foreground hover:bg-primary/90"
-//       >
-//         {isLoading ? (
-//           <>
-//             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-//             Submitting...
-//           </>
-//         ) : (
-//           'Submit'
-//         )}
-//       </Button>
-//     </div>
-//   )
-// }
+function ReviewStep() {
+  const {
+    watch,
+    formState: { errors },
+  } = useFormContext<fullFormValues>();
+  const formData = watch();
+  
+  return (
+    <div>
+      <h2 className="text-2xl font-bold mb-4 text-foreground">Review</h2>
+      <div className="space-y-4">
+        <div>
+          <h3 className="font-semibold text-foreground">Base Image:</h3>
+          <p className="bg-muted/50 dark:bg-muted p-2 rounded-md">{formData.baseImage}</p>
+        </div>
+        <div>
+          <h3 className="font-semibold text-foreground">Dependencies:</h3>
+          <pre className="bg-muted/50 dark:bg-muted p-2 rounded-md">{formData.dependencies}</pre>
+        </div>
+        <div>
+          <h3 className="font-semibold text-foreground">Environment Variables:</h3>
+          <pre className="bg-muted/50 dark:bg-muted p-2 rounded-md">{formData.environment}</pre>
+        </div>
+        <div>
+          <h3 className="font-semibold text-foreground">Build Commands:</h3>
+          <pre className="bg-muted/50 dark:bg-muted p-2 rounded-md">{formData.commands}</pre>
+        </div>
+      </div>
+      {/* <Button
+        type="button"
+        onClick={onSubmit}
+        disabled={isLoading}
+        className="mt-4 bg-primary text-primary-foreground hover:bg-primary/90"
+      >
+        {isLoading ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Submitting...
+          </>
+        ) : (
+          'Submit'
+        )}
+      </Button> */}
+    </div>
+  )
+}
