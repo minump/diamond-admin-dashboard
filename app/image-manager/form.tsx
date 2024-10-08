@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 
 export function ContainerManagerForm() {
-  const [containersData, setContainersData] = useState<{ [key: string]: any }>({});
+  const [containersData, setContainersData] = useState<{ [key: string]: any }>({});;
 
   const fetchContainerStatus = async () => {
     try {

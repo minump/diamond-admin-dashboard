@@ -1,7 +1,6 @@
 import './globals.css';
 
 import Link from 'next/link';
-import { Analytics } from '@vercel/analytics/react';
 import {
   Logo,
   SettingsIcon,
@@ -14,9 +13,12 @@ import { NavItem } from './nav-item';
 import { is_authenticated, signOut } from '@/lib/authUtils';
 import { Toaster } from '@/components/ui/toaster';
 import { DashboardIcon, GlobeIcon } from '@radix-ui/react-icons';
+import { ImageIcon } from '@radix-ui/react-icons';
 
 import { LogoutButton } from '@/components/logout-button';
 import { LoginButton } from '@/components/login-button';
+import ThemeToggle from '@/components/layout/ThemeToggle/theme-toggle';
+import ThemeProvider from '@/components/layout/ThemeToggle/theme-provider';
 
 
 export const metadata = {
@@ -30,12 +32,17 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // const FLASK_URL = process.env.FLASK_URL;
   const isAuthenticated = await is_authenticated();
 
   return (
-    <html lang="en" className="h-full bg-gray-50">
+    <html lang="en" className="h-full bg-baby_powder dark:bg-raisin_black">
       <body>
+      <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
         <div className="grid min-h-screen w-full lg:grid-cols-[280px_1fr]">
           <div className="hidden border-r bg-gray-100/40 lg:block dark:bg-gray-800/40">
             <div className="flex h-full max-h-screen flex-col gap-2">
@@ -45,10 +52,10 @@ export default async function RootLayout({
                   href="/"
                 >
                   <Logo />
-                  <span className="">DIAMOND</span>
+                  <span className="text-rose_red dark:text-honolulu_blue">DIAMOND</span>
                 </Link>
               </div>
-              <div className="flex-1 overflow-auto py-2">
+              <div className="flex-1 overflow-auto py-2 h-full">
                 {isAuthenticated ? (
                   <nav className="grid items-start px-4 text-sm font-medium">
                     <NavItem href="/">
@@ -79,6 +86,10 @@ export default async function RootLayout({
                       <SettingsIcon className="h-6 w-6" />
                       Settings
                     </NavItem>
+                    {/* <NavItem href="/image-builder">
+                      <ImageIcon className="h-6 w-6" />
+                      Image Builder
+                    </NavItem> */}
                   </nav>
                 ) : (
                   <></>
@@ -93,7 +104,7 @@ export default async function RootLayout({
                 href="/"
               >
                 <Logo />
-                <span className="">DIAMOND</span>
+                <span className="text-rose_red dark:text-honolulu_blue">DIAMOND</span>
               </Link>
 
               {isAuthenticated ? <LogoutButton /> : <LoginButton />}
@@ -101,9 +112,12 @@ export default async function RootLayout({
             </header>
             {children}
           </div>
+          <div className="flex justify-end me-2 flex-col items-end mb-2">
+                <ThemeToggle />
+          </div>
           <Toaster />
         </div>
-        <Analytics />
+      </ThemeProvider>
       </body>
     </html>
   );

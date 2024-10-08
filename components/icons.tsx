@@ -117,21 +117,13 @@ export function Spinner() {
 
 export function Logo() {
   return (
-    <svg
+    <img
+      src="/Diamond logo.png"
+      alt="Diamond Logo"
       width="32"
       height="32"
-      viewBox="0 0 32 32"
-      fill="none"
       className="text-gray-100"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <polygon
-        points="16,1 31,12 25,31 7,31 1,12"
-        style={{ fill: 'currentColor' }}
-      />
-      <polygon points="16,3 29,12 24,29 8,29 3,12" style={{ fill: 'white' }} />
-      <polygon points="16,6 27,12 23,27 9,27 5,12" style={{ fill: 'black' }} />
-    </svg>
+    />
   );
 }
 

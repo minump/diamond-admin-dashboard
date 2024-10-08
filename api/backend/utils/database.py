@@ -169,6 +169,9 @@ class Database:
         base_image = None,
         name=None,
         location=None,
+        dependencies=None,
+        environment=None,
+        commands=None,
         description=None,
     ):
         """Persist container information."""
@@ -181,11 +184,14 @@ class Database:
         name = str(name) if name is not None else None
         location = str(location) if location is not None else None
         description = str(description) if description is not None else None
+        dependencies = str(dependencies) if dependencies is not None else None
+        environment = str(environment) if environment is not None else None
+        commands = str(commands) if commands is not None else None
 
         db.execute(
-            """INSERT INTO container (identity_id, container_task_id, base_image, name, location, description)
-            VALUES (?, ?, ?, ?, ?, ?)""",
-            (identity_id, container_task_id, base_image, name, location, description),
+            """INSERT INTO container (identity_id, container_task_id, base_image, name, location, description, dependencies, environment, commands)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            (identity_id, container_task_id, base_image, name, location, description, dependencies, environment, commands),
         )
         db.commit()
 
@@ -193,7 +199,7 @@ class Database:
         """Load container data for a specific profile."""
         log.info(f"Loading container data for identity_id: {identity_id}")
         return self.query_db(
-            """SELECT container_task_id, base_image, name, location, description FROM container
+            """SELECT container_task_id, base_image, name, location, description, dependencies, environment, commands FROM container
             WHERE identity_id = ?""",
             [identity_id]
         )

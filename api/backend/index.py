@@ -72,15 +72,37 @@ def diamond_list_active_endpoints():
     return active_endpoints
 
 
-def container_builder_wrapper(base_image, location, name):
+def container_builder_wrapper(base_image, location, name, dependencies, environment, commands):
     import os
     import textwrap
-    load_apptainer = "module load tacc-apptainer"
-    load_apptainer = textwrap.dedent(load_apptainer.strip())
-    command = f"apptainer pull {location}/{name} {base_image}"
-    command = textwrap.dedent(command.strip())
-    os.system(f"({load_apptainer}) 2>&1 | tee /work/09912/haotianxie/frontera/log.txt") 
-    os.system(f"({command}) 2>&1 | tee /work/09912/haotianxie/frontera/log.txt")
+
+    # Create a definition file for the container
+    def_file_content = f"""
+    Bootstrap: docker
+    From: {base_image}
+
+    %post
+        apt-get -y update
+        apt-get -y install python3-pip
+        echo "{dependencies}" > {location}/requirements.txt
+        echo "{commands}" > {location}/commands.sh
+        chmod +x {location}/commands.sh
+        {location}/commands.sh
+
+    %environment
+        {environment}
+
+    %runscript
+        {location}/commands.sh
+    """
+    def_file_path = os.path.join(location, f"{name}.def")
+    with open(def_file_path, "w") as def_file:
+        def_file.write(textwrap.dedent(def_file_content.strip()))
+
+    # Build the container
+    build_command = f"apptainer build {os.path.join(location, name)}.sif {def_file_path}"
+    os.system(f"({build_command}) 2>&1 | tee {location}/{name}_log.txt")
+
     return
 
 
@@ -94,6 +116,9 @@ def diamond_endpoint_register_container():
 
     name = request.json.get("name")
     base_image = request.json.get("base_image")
+    dependencies = request.json.get("dependencies")
+    environment = request.json.get("environment")
+    commands = request.json.get("commands")
     description = request.json.get("description")
     location = request.json.get("location")
 
@@ -108,6 +133,9 @@ def diamond_endpoint_register_container():
         name=name,
         endpoint_id=endpoint_id,
         function_id=function_id,
+        dependencies=dependencies,
+        environment=environment,
+        commands=commands,
     )
 
     database.save_container(
@@ -116,6 +144,9 @@ def diamond_endpoint_register_container():
         base_image=base_image,
         name=name,
         location=location,
+        dependencies=dependencies,
+        environment=environment,
+        commands=commands,
         description=description,
     )
     return jsonify(container_task_id)

@@ -1,6 +1,7 @@
 'use server';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
+import { redirect } from 'next/navigation';
 
 const HOST = process.env.HOST;
 const NEXT_URL = process.env.NEXT_URL;
@@ -33,6 +34,17 @@ export async function is_authenticated() {
     sessionData = await response.json();
   }
   return sessionData.is_authenticated;
+}
+
+export async function logout() {
+  try {
+    await signOut();
+    redirect('/');  // Redirect to home page after logout
+  } catch (error) {
+    console.error('Logout failed:', error);
+    // You could throw an error here to be caught by error boundaries
+    // or return an error message to be displayed
+  }
 }
 
 export async function signOut() {
