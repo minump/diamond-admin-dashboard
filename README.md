@@ -63,6 +63,21 @@ Diamond Admin Dashboard is a comprehensive admin interface built with Next.js an
 6. **Access the Application:**
    - Open your web browser and navigate to `http://localhost:3000` to view the dashboard.
 
+## Deployment Instructions
+- ssh to deployment machine 
+- cd `Diamond-Proj/diamond-admin-dashboard`
+- Change git branch to the deployment PR. Eg: `gh pr checkout 9`
+- Build the docker-stack : `sudo docker-compose build`
+- Check if `certs/acme.json` file exists with 600 permissions. `chmod 600 certs/acme.json`.
+- Run the docker-stack : `sudo docker-compose up`
+   - OR Run the docker-stack in background : `sudo dokcer-compose up -d`
+- Test deployment at `diamond.ncsa.illinois.edu`
+  
+- If you ran into error `[Errno 28] No space left on device:`, try below:
+    - Free more spaces by running `docker system prune --all` 
+    - If in local, increase the Disk image size. You can find the configuration in Docker Desktop
+
+
 ## Additional Information
 
 - Ensure all environment variables and configurations are set correctly in the `.env` file for both the backend and frontend services.
