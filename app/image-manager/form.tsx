@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-export function ContainerManagerForm() {
+export function ContainerManagerForm( { isAuthenticated }: { isAuthenticated: boolean } ) {
   const [containersData, setContainersData] = useState<{ [key: string]: any }>({});;
 
   const fetchContainerStatus = async () => {
@@ -47,9 +47,9 @@ export function ContainerManagerForm() {
 
   useEffect(() => {
     fetchContainerStatus();
-    const intervalId = setInterval(fetchContainerStatus, 5000);
-    return () => clearInterval(intervalId);
-  }, []);
+    // const intervalId = setInterval(fetchContainerStatus, 5000);
+    // return () => clearInterval(intervalId);
+  }, [isAuthenticated]);
 
   return (
     <div>

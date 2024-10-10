@@ -9,7 +9,7 @@ export default async function ContainerManagerPage() {
         <h1 className="font-semibold text-lg md:text-2xl">Task Manager</h1>
       </div>
       <div className="flex flex-2 flex-col items-center gap-2 px-8 w-full">
-        <ContainerManagerForm />
+        <ContainerManagerForm isAuthenticated/>
       </div>
     </main>
   );
