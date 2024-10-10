@@ -72,7 +72,7 @@ def diamond_list_active_endpoints():
     return active_endpoints
 
 
-def container_builder_wrapper(base_image, location, name, dependencies, environment, commands):
+def apptainer_builder_wrapper(base_image, location, name, dependencies, environment, commands):
     import os
     import textwrap
 
@@ -105,6 +105,41 @@ def container_builder_wrapper(base_image, location, name, dependencies, environm
 
     return
 
+## TODO for testing in non-HPC systems
+def container_builder_wrapper(base_image, location, name, dependencies, environment, commands):
+    import os
+    import textwrap
+
+    # Create a Dockerfile for the container
+    dockerfile_content = f"""
+    FROM {base_image}
+
+    RUN apt-get -y update && apt-get -y install python3-pip
+    COPY requirements.txt /app/requirements.txt
+    RUN pip install -r /app/requirements.txt
+    COPY commands.sh /app/commands.sh
+    RUN chmod +x /app/commands.sh
+
+    ENV {environment}
+
+    CMD ["/app/commands.sh"]
+    """
+    dockerfile_path = os.path.join(location, "Dockerfile")
+    with open(dockerfile_path, "w") as dockerfile:
+        dockerfile.write(textwrap.dedent(dockerfile_content.strip()))
+
+    # Write dependencies and commands to files
+    with open(os.path.join(location, "requirements.txt"), "w") as req_file:
+        req_file.write(dependencies)
+    
+    with open(os.path.join(location, "commands.sh"), "w") as cmd_file:
+        cmd_file.write(commands)
+
+    # Build the Docker image
+    build_command = f"docker build -t {name} {location}"
+    os.system(f"({build_command}) 2>&1 | tee {location}/{name}_log.txt")
+
+    return
 
 @app.route("/api/image_builder", methods=["POST"])
 @authenticated
@@ -113,7 +148,7 @@ def diamond_endpoint_image_builder():
     globus_compute_client = initialize_globus_compute_client()
 
     endpoint_id = request.json.get("endpoint")
-    function_id = globus_compute_client.register_function(container_builder_wrapper)
+    function_id = globus_compute_client.register_function(apptainer_builder_wrapper)
 
     # name = request.json.get("name")
     name = f"image-{endpoint_id}-v{datetime.now().strftime('%Y%m%d%H%M%S')}"
@@ -140,7 +175,7 @@ def diamond_endpoint_image_builder():
         base_image=base_image,
         location=location,
         name=name,
-        endpoint_id='adada910-c14c-4e6d-9156-3b78fa6e8472',
+        endpoint_id=endpoint_id,
         function_id=function_id,
         dependencies=dependencies,
         environment=environment,
