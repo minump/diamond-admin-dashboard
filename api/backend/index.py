@@ -315,11 +315,9 @@ def profile():
         log.info(f"Profile: {profile}")
 
         if profile:
-            name, email, institution = profile
-
-            session["name"] = name
-            session["email"] = email
-            session["institution"] = institution
+            session["name"] = profile.name
+            session["email"] = profile.email
+            session["institution"] = profile.institution
         else:
             flash("Please complete any missing profile fields and press Save.")
 
