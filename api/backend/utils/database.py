@@ -202,7 +202,7 @@ class Database:
         """Load container data for a specific profile."""
         log.info(f"Loading container data for identity_id: {identity_id}")
         return self.query_db(
-            """SELECT container_task_id, base_image, name, dependencies, environment, commands FROM container
+            """SELECT container_task_id, base_image, name, location, description, dependencies, environment, commands FROM container
             WHERE identity_id = ?""",
             [identity_id]
         )
