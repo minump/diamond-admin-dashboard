@@ -72,7 +72,7 @@ def diamond_list_active_endpoints():
     return active_endpoints
 
 
-def container_builder_wrapper(base_image, location, name, dependencies, environment, commands):
+def apptainer_builder_wrapper(base_image, location, name, dependencies, environment, commands):
     import os
     import textwrap
 
@@ -105,27 +105,71 @@ def container_builder_wrapper(base_image, location, name, dependencies, environm
 
     return
 
+## TODO for testing in non-HPC systems
+def container_builder_wrapper(base_image, location, name, dependencies, environment, commands):
+    import os
+    import textwrap
 
-@app.route("/api/register_container", methods=["POST"])
+    # Create a Dockerfile for the container
+    dockerfile_content = f"""
+    FROM {base_image}
+
+    RUN apt-get -y update && apt-get -y install python3-pip
+    COPY requirements.txt /app/requirements.txt
+    RUN pip install -r /app/requirements.txt
+    COPY commands.sh /app/commands.sh
+    RUN chmod +x /app/commands.sh
+
+    ENV {environment}
+
+    CMD ["/app/commands.sh"]
+    """
+    dockerfile_path = os.path.join(location, "Dockerfile")
+    with open(dockerfile_path, "w") as dockerfile:
+        dockerfile.write(textwrap.dedent(dockerfile_content.strip()))
+
+    # Write dependencies and commands to files
+    with open(os.path.join(location, "requirements.txt"), "w") as req_file:
+        req_file.write(dependencies)
+    
+    with open(os.path.join(location, "commands.sh"), "w") as cmd_file:
+        cmd_file.write(commands)
+
+    # Build the Docker image
+    build_command = f"docker build -t {name} {location}"
+    os.system(f"({build_command}) 2>&1 | tee {location}/{name}_log.txt")
+
+    return
+
+@app.route("/api/image_builder", methods=["POST"])
 @authenticated
-def diamond_endpoint_register_container():
+def diamond_endpoint_image_builder():
+    # logging.info(f"request.json: {request.json}")
     globus_compute_client = initialize_globus_compute_client()
 
     endpoint_id = request.json.get("endpoint")
-    function_id = globus_compute_client.register_function(container_builder_wrapper)
+    function_id = globus_compute_client.register_function(apptainer_builder_wrapper)
 
-    name = request.json.get("name")
+    # name = request.json.get("name")
+    name = f"image-{endpoint_id}-v{datetime.now().strftime('%Y%m%d%H%M%S')}"
     base_image = request.json.get("base_image")
     dependencies = request.json.get("dependencies")
     environment = request.json.get("environment")
     commands = request.json.get("commands")
-    description = request.json.get("description")
-    location = request.json.get("location")
-
+    # description = request.json.get("description")
+    # location = request.json.get("location")
+    location = "/home/ubuntu"
     logging.info(function_id)
     logging.info(f"endpoint: {endpoint_id}")
+    logging.info(f"name: {name}")
+    logging.info(f"base_image: {base_image}")
+    logging.info(f"dependencies: {dependencies}")
+    logging.info(f"environment: {environment}")
+    logging.info(f"commands: {commands}")
+    # logging.info(f"description: {description}")
+    logging.info(f"location: {location}")
 
-    logging.info(f"{name}\n{base_image}\n{description}\n{location}".format(name, base_image, description, location))
+    # logging.info(f"{name}\n{base_image}\n{description}\n{location}".format(name, base_image, description, location))
     
     container_task_id = globus_compute_client.run(
         base_image=base_image,
@@ -138,6 +182,7 @@ def diamond_endpoint_register_container():
         commands=commands,
     )
 
+    logging.info(f"container_task_id: {container_task_id}")
     database.save_container(
         container_task_id=container_task_id,
         identity_id=session["primary_identity"],
@@ -147,7 +192,7 @@ def diamond_endpoint_register_container():
         dependencies=dependencies,
         environment=environment,
         commands=commands,
-        description=description,
+        # description=description,
     )
     return jsonify(container_task_id)
 
@@ -157,9 +202,10 @@ def diamond_endpoint_register_container():
 def get_containers():
     global_compute_client = initialize_globus_compute_client()
 
-    conatainers = database.load_containers(identity_id=session["primary_identity"])
+    containers = database.load_containers(identity_id=session["primary_identity"])
     containers_data = {}
-    for container in conatainers:
+    for container in containers:
+        logging.info(f"container: {container['container_task_id']}")
         container_task_id = container["container_task_id"]
         name = container["name"]
         container_status = global_compute_client.get_task(container_task_id)
@@ -168,7 +214,7 @@ def get_containers():
             "status": container_status["status"],
             "base_image": container["base_image"],
             "location": container["location"],
-            "description": container["description"],
+            # "description": container["description"],
         }
 
     logging.info(f"container status is {containers_data}")
@@ -183,6 +229,10 @@ def diamond_delete_container():
     logging.info(f"container {container_id} deleted")
     return jsonify({"message": "Container deleted successfully"})
 
+# Todo:
+# 1. Build image - apptainer build - register container -> Build image from image builder form
+# 2. Run image - apptainer run - submit task -> Run image (command, container_path) from job composer form
+
 
 def task_wrapper(task_command, log_path, container_path):
     import os
@@ -192,7 +242,7 @@ def task_wrapper(task_command, log_path, container_path):
         os.system(f"({command}) 2>&1 | tee {log_path}")
         return log_path
     else:
-        load_apptainer = "module load tacc-apptainer"
+        load_apptainer = "module load apptainer"
         load_apptainer = textwrap.dedent(load_apptainer.strip())
         command = f"apptainer run --nv {container_path} {task_command}"
         command = textwrap.dedent(command.strip())

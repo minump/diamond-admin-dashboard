@@ -64,6 +64,9 @@ class Database:
                 name TEXT,
                 location TEXT,
                 description TEXT,
+                dependencies TEXT,
+                environment TEXT,
+                commands TEXT,
                 FOREIGN KEY (identity_id) REFERENCES profile(identity_id)
             )
             """

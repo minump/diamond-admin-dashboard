@@ -1,9 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { defineStepper } from '@stepperize/react'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm, useFormContext, UseFormReturn } from 'react-hook-form'
+import { Control, useForm, useFormContext, UseFormReturn } from 'react-hook-form'
 import { Schema, z } from 'zod'
 import { Button } from '@/components/ui/button'
 import {
@@ -20,6 +20,13 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { useToast } from '@/components/ui/use-toast'
 import { Loader2 } from 'lucide-react'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 
 const baseImageSchema = z.object({
@@ -40,7 +47,13 @@ const commandsSchema = z.object({
 
 const reviewSchema = z.object({})
 
+const endpointSchema = z.object({
+  endpoint: z.string().min(1, 'Endpoint selection is required'),
+  name: z.string().min(1, 'Container name is required')
+})
+
 const { Scoped, useStepper } = defineStepper(
+  { id: 'endpoint', title: 'Select Endpoint', schema: endpointSchema },
   { id: 'base-image', title: 'Base Image', schema: baseImageSchema},
   { id: 'dependencies', title: 'Dependencies', schema: dependenciesSchema },
   { id: 'environment', title: 'Environment Variables', schema: environmentSchema },
@@ -48,47 +61,64 @@ const { Scoped, useStepper } = defineStepper(
   { id: 'review', title: 'Review', schema: reviewSchema }
 )
 
-type FormData = z.infer<typeof baseImageSchema> &
+type FormData = z.infer<typeof endpointSchema> &
+  z.infer<typeof baseImageSchema> &
   z.infer<typeof dependenciesSchema> &
   z.infer<typeof environmentSchema> &
   z.infer<typeof commandsSchema>
 
-type baseImageFormValues = z.infer<typeof baseImageSchema>
-type dependenciesFormValues = z.infer<typeof dependenciesSchema>
-type envrionmentFormValues = z.infer<typeof environmentSchema>
-type commandsFormValues = z.infer<typeof commandsSchema>
-type fullFormValues = baseImageFormValues &
-  dependenciesFormValues &
-  envrionmentFormValues &
-  commandsFormValues
+type EndpointFormValues = z.infer<typeof endpointSchema>
+type BaseImageFormValues = z.infer<typeof baseImageSchema>
+type DependenciesFormValues = z.infer<typeof dependenciesSchema>
+type EnvironmentFormValues = z.infer<typeof environmentSchema>
+type CommandsFormValues = z.infer<typeof commandsSchema>
 
+type FullFormValues = EndpointFormValues &
+  BaseImageFormValues &
+  DependenciesFormValues &
+  EnvironmentFormValues &
+  CommandsFormValues
 
 export function ImageBuilderStepper() {
   const [formData, setFormData] = useState<Partial<FormData>>({})
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
+  const [endpoints, setEndpoints] = useState<
+    { endpoint_uuid: string; endpoint_name: string }[]
+  >([])
 
   const form = useForm<FormData>({
     resolver: zodResolver(z.object({})),
     defaultValues: formData
   })
 
+  const { control, register } = form;
+
   const handleStepSubmit = (stepData: Partial<FormData>) => {
     console.log(stepData);
     setFormData((prev) => ({ ...prev, ...stepData }))
   }
 
-  // const onSubmit = (values: z.infer<typeof stepper)
+  // const onSubmit = (values: z.infer<typeof stepper))
 
   const handleFinalSubmit = async (data: FormData) => {
     setIsLoading(true)
     try {
-      const response = await fetch('/api/register_container', {
+      const payload = {
+        endpoint: data.endpoint,
+        base_image: data.baseImage,  // Changed from baseImage to base_image
+        dependencies: data.dependencies,
+        environment: data.environment,
+        commands: data.commands,
+        // name: data.name,  // Uncomment if you want to send a name
+      }
+
+      const response = await fetch('/api/image_builder', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify(payload)
       })
 
       if (!response.ok) throw new Error('Failed to submit image build configuration')
@@ -112,6 +142,19 @@ export function ImageBuilderStepper() {
     }
   }
 
+  useEffect(() => {
+    async function fetchEndpoints() {
+      try {
+        const response = await fetch('/api/list_active_endpoints')
+        const data = await response.json()
+        setEndpoints(data)
+      } catch (error) {
+        console.error('Error fetching endpoints:', error)
+      }
+    }
+    fetchEndpoints()
+  }, [])
+
   return (
     <Scoped>
       <StepperContent
@@ -119,6 +162,8 @@ export function ImageBuilderStepper() {
         onStepSubmit={handleStepSubmit}
         onFinalSubmit={handleFinalSubmit}
         isLoading={isLoading}
+        control={control}
+        endpoints={endpoints}
       />
     </Scoped>
   )
@@ -128,12 +173,16 @@ function StepperContent({
   formData,
   onStepSubmit,
   onFinalSubmit,
-  isLoading
+  isLoading,
+  control,
+  endpoints
 }: {
   formData: Partial<FormData>
   onStepSubmit: (data: Partial<FormData>) => void
   onFinalSubmit: (data: FormData) => void
   isLoading: boolean
+  control: Control<FormData>
+  endpoints: { endpoint_uuid: string; endpoint_name: string }[]
 }) {
   const stepper = useStepper()
   const form = useForm<FormData>({
@@ -155,9 +204,7 @@ function StepperContent({
     onStepSubmit(values as FormData);
   }
 
-
   return (
-    // <div className="w-full max-w-2xl mx-auto bg-card dark:bg-card/80 p-6 rounded-xl shadow-lg border border-border">
     <div className="bg-card dark:bg-card/80 shadow-lg rounded-xl p-6 border border-border">
       <div className="mb-8">
         <StepIndicator />
@@ -165,11 +212,12 @@ function StepperContent({
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onStepSubmit)}>
           {stepper.switch({
-            'base-image': () => <BaseImageStep/>,
-            dependencies: () => <DependenciesStep/>,
-            environment: () => <EnvironmentStep/>,
-            commands: () => <CommandsStep/>,
-            review: () => <ReviewStep onSubmit={onSubmit} isLoading={isLoading}/>
+            endpoint: () => <EndpointStep control={control} endpoints={endpoints} />,
+            'base-image': () => <BaseImageStep />,
+            dependencies: () => <DependenciesStep />,
+            environment: () => <EnvironmentStep />,
+            commands: () => <CommandsStep />,
+            review: () => <ReviewStep onSubmit={onSubmit} isLoading={isLoading} />
           })}
         </form>
       </Form>
@@ -183,7 +231,23 @@ function StepperContent({
         >
           Previous
         </Button>
-        {!stepper.isLast && (
+        {stepper.isLast ? (
+          <Button
+            type="button"
+            onClick={() => onSubmit(form.getValues() as FormData)}
+            disabled={isLoading}
+            className="bg-primary text-primary-foreground hover:bg-primary/90"
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Submitting...
+              </>
+            ) : (
+              'Submit'
+            )}
+          </Button>
+        ) : (
           <Button
             type="button"
             onClick={stepper.next}
@@ -227,103 +291,47 @@ function StepIndicator() {
   )
 }
 
-function BaseImageStep(){
+function BaseImageStep() {
   const {
     register,
-    formState: {errors},
-   } = useFormContext<baseImageFormValues>();
+    formState: { errors },
+  } = useFormContext<BaseImageFormValues>();
   
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4">Base Image</h2>
       <label htmlFor={register('baseImage').name}>Base Image</label>
       <Input placeholder="e.g., python:3.9-slim" {...register('baseImage')} />
-      {/* <FormField
-        control={form.control}
-        name="baseImage"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Base Image</FormLabel>
-            <FormControl>
-              <Input placeholder="e.g., python:3.9-slim" {...field} />
-            </FormControl>
-            <FormDescription>
-              Enter the base Docker image for your build
-            </FormDescription>
-            <FormMessage />
-          </FormItem>
-        )}
-      /> */}
-
     </div>
   );
 }
 
-function DependenciesStep(){
+function DependenciesStep() {
   const {
     register,
-    formState: {errors},
-   } = useFormContext<dependenciesFormValues>();
+    formState: { errors },
+  } = useFormContext<DependenciesFormValues>();
 
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4">Dependencies</h2>
       <label htmlFor={register('dependencies').name}>Copy Pasta your requirements.txt here</label>
       <Input placeholder="e.g., numpy==1.21.0&#10;pandas==1.3.0" {...register('dependencies')} />
-      {/* <FormField
-        control={form.control}
-        name="dependencies"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Dependencies</FormLabel>
-            <FormControl>
-              <Textarea
-                placeholder="numpy==1.21.0&#10;pandas==1.3.0"
-                {...field}
-              />
-            </FormControl>
-            <FormDescription>
-              Enter your project dependencies, one per line
-            </FormDescription>
-            <FormMessage />
-          </FormItem>
-        )}
-      /> */}
     </div>
   )
 }
 
 function EnvironmentStep() {
-
   const {
     register,
-    formState: {errors},
-   } = useFormContext<envrionmentFormValues>();
+    formState: { errors },
+  } = useFormContext<EnvironmentFormValues>();
 
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4">Environment Variables</h2>
       <label htmlFor={register('environment').name}>Dependencies</label>
       <Input placeholder="e.g., DEBUG=1&#10;API_KEY=your_api_key" {...register('environment')} />
-      {/* <FormField
-        control={form.control}
-        name="environment"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Environment Variables</FormLabel>
-            <FormControl>
-              <Textarea
-                placeholder="DEBUG=1&#10;API_KEY=your_api_key"
-                {...field}
-              />
-            </FormControl>
-            <FormDescription>
-              Enter environment variables, one per line (KEY=VALUE)
-            </FormDescription>
-            <FormMessage />
-          </FormItem>
-        )}
-      /> */}
     </div>
   )
 }
@@ -331,48 +339,33 @@ function EnvironmentStep() {
 function CommandsStep() {
   const {
     register,
-    formState: {errors},
-   } = useFormContext<commandsFormValues>();
+    formState: { errors },
+  } = useFormContext<CommandsFormValues>();
 
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4">Build Commands</h2>
       <label htmlFor={register('commands').name}>Insert your build commands here</label>
       <Input placeholder="e.g., pip install -r requirements.txt&#10;python setup.py install" {...register('commands')} />
-      {/* <FormField
-        control={form.control}
-        name="commands"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Build Commands</FormLabel>
-            <FormControl>
-              <Textarea
-                placeholder="pip install -r requirements.txt&#10;python setup.py install"
-                {...field}
-              />
-            </FormControl>
-            <FormDescription>
-              Enter build commands, one per line
-            </FormDescription>
-            <FormMessage />
-          </FormItem>
-        )}
-      /> */}
     </div>
   )
 }
 
-function ReviewStep({onSubmit, isLoading}: {onSubmit: (data: fullFormValues) => void, isLoading: boolean}) {
+function ReviewStep({ onSubmit, isLoading }: { onSubmit: (data: FullFormValues) => void, isLoading: boolean }) {
   const {
     watch,
     formState: { errors },
-  } = useFormContext<fullFormValues>();
+  } = useFormContext<FullFormValues>();
   const formData = watch();
   
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4 text-foreground">Review</h2>
       <div className="space-y-4">
+        <div>
+          <h3 className="font-semibold text-foreground">Selected Endpoint:</h3>
+          <p className="bg-muted/50 dark:bg-muted p-2 rounded-md">{formData.endpoint}</p>
+        </div>
         <div>
           <h3 className="font-semibold text-foreground">Base Image:</h3>
           <p className="bg-muted/50 dark:bg-muted p-2 rounded-md">{formData.baseImage}</p>
@@ -390,21 +383,59 @@ function ReviewStep({onSubmit, isLoading}: {onSubmit: (data: fullFormValues) => 
           <pre className="bg-muted/50 dark:bg-muted p-2 rounded-md">{formData.commands}</pre>
         </div>
       </div>
-      <Button
-        type="button"
-        onClick={() => onSubmit(formData)}
-        disabled={isLoading}
-        className="mt-4 bg-primary text-primary-foreground hover:bg-primary/90"
-      >
-        {isLoading ? (
-          <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Submitting...
-          </>
-        ) : (
-          'Submit'
+    </div>
+  )
+}
+
+function EndpointStep({ control, endpoints }: { control: Control<FormData>, endpoints: { endpoint_uuid: string; endpoint_name: string }[] }) {
+  const {
+    register,
+    formState: { errors },
+    setValue,
+  } = useFormContext<EndpointFormValues>()
+
+  return (
+    <div>
+      <h2 className="text-2xl font-bold mb-4">Select Endpoint</h2>
+      <FormField
+        control={control}
+        name="endpoint"
+        render={({ field }) => (
+          <FormItem className="w-[60%] md:w-[20%]">
+            <FormLabel>Endpoint</FormLabel>
+            <Select
+              onValueChange={(value) => {
+                setValue('endpoint', value)
+                field.onChange(value)
+              }}
+              defaultValue={field.value}
+            >
+              <FormControl>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select endpoint" />
+                </SelectTrigger>
+              </FormControl>
+              <SelectContent>
+                {endpoints.length > 0 ? (
+                  endpoints.map((endpoint) => (
+                    <SelectItem
+                      key={endpoint.endpoint_uuid}
+                      value={endpoint.endpoint_uuid}
+                    >
+                      {endpoint.endpoint_name}
+                    </SelectItem>
+                  ))
+                ) : (
+                  <SelectItem value="none" disabled>
+                    No endpoints available
+                  </SelectItem>
+                )}
+              </SelectContent>
+            </Select>
+            <FormMessage>{errors.endpoint?.message}</FormMessage>
+          </FormItem>
         )}
-      </Button>
+      />
     </div>
   )
 }
