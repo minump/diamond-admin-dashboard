@@ -205,15 +205,15 @@ def get_containers():
     containers = database.load_containers(identity_id=session["primary_identity"])
     containers_data = {}
     for container in containers:
-        logging.info(f"container: {container['container_task_id']}")
-        container_task_id = container["container_task_id"]
-        name = container["name"]
+        logging.info(f"container: {container.container_task_id}")
+        container_task_id = container.container_task_id
+        name = container.name
         container_status = global_compute_client.get_task(container_task_id)
         containers_data[name] = {
             "container_task_id": container_task_id,
             "status": container_status["status"],
-            "base_image": container["base_image"],
-            "location": container["location"],
+            "base_image": container.base_image,
+            "location": container.location,
             # "description": container["description"],
         }
 
@@ -289,11 +289,9 @@ def diamond_get_task_status():
     tasks = database.load_tasks(identity_id=session["primary_identity"])
     tasks_data = {}
     for task in tasks:
-        task_id = task["task_id"]
+        task_id = task.task_id
         logging.info(f"task id is {task_id}")
-        logging.info(f"====================")
         status = global_compute_client.get_task(task_id)
-        logging.info(f"111111")
         tasks_data[task_id] = status
         
     logging.info(f"task status is {tasks_data}")
@@ -365,11 +363,9 @@ def profile():
         log.info(f"Profile: {profile}")
 
         if profile:
-            name, email, institution = profile
-
-            session["name"] = name
-            session["email"] = email
-            session["institution"] = institution
+            session["name"] = profile.name
+            session["email"] = profile.email
+            session["institution"] = profile.institution
         else:
             flash("Please complete any missing profile fields and press Save.")
 
@@ -486,11 +482,9 @@ def authcallback():
         profile = database.load_profile(session["primary_identity"])
 
         if profile:
-            name, email, institution = profile
-
-            session["name"] = name
-            session["email"] = email
-            session["institution"] = institution
+            session["name"] = profile.name
+            session["email"] = profile.email
+            session["institution"] = profile.institution
             log.info("profile found redirecting to profile... GET")
             return redirect(url_for("profile"))
         else:
